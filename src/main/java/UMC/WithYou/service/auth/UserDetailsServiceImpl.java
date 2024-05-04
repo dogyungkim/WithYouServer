@@ -1,7 +1,6 @@
 package UMC.WithYou.service.auth;
 
 import UMC.WithYou.domain.auth.UserPrincipal;
-import UMC.WithYou.domain.member.Email;
 import UMC.WithYou.domain.member.Identifier;
 import UMC.WithYou.domain.member.Member;
 import UMC.WithYou.repository.member.MemberRepository;
