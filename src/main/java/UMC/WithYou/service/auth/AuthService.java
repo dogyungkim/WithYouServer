@@ -2,7 +2,6 @@ package UMC.WithYou.service.auth;
 
 import UMC.WithYou.domain.auth.RefreshToken;
 import UMC.WithYou.domain.auth.UserInfo;
-import UMC.WithYou.domain.member.Email;
 import UMC.WithYou.domain.member.Identifier;
 import UMC.WithYou.domain.member.Member;
 import UMC.WithYou.domain.member.MemberType;
@@ -11,7 +10,19 @@ import UMC.WithYou.dto.auth.LoginResponse;
 import UMC.WithYou.repository.auth.RefreshTokenRepository;
 import UMC.WithYou.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.core.ApplicationContext;
+import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.aspectj.JtaAnnotationTransactionAspect;
+import org.springframework.transaction.interceptor.BeanFactoryTransactionAttributeSourceAdvisor;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +31,9 @@ public class AuthService {
     private final OAuth2ProviderService oAuth2ProviderService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenProvider tokenProvider;
+    private final AbstractAutoProxyCreator
 
+    @Transactional
     public LoginResponse authenticateOrRegisterUser(LoginRequest request) throws Exception {
         UserInfo userInfo = getUserInfo(request);
         Member member = processMember(userInfo);
