@@ -37,3 +37,4 @@ jobs:
               --network WithYou-network \
               --name with-you-container \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/withyou:latest
+              
