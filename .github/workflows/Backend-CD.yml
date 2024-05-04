@@ -29,11 +29,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/with-you:latest
+            docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/withyou:latest
             docker stop with-you-container || true
             docker rm with-you-container || true
             docker run -d -p 8080:8080 \
               -e ENCRYPT_KEY=${{ secrets.ENCRYPT_KEY }} \
               --network WithYou-network \
               --name with-you-container \
-              835354238306.dkr.ecr.ap-northeast-1.amazonaws.com/with-you:latest
+              835354238306.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/withyou:latest
