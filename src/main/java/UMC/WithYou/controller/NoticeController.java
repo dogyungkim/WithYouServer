@@ -110,4 +110,5 @@ public class NoticeController {
         Notice notice=noticeCommandService.fix(request);
         return ApiResponse.onSuccess(NoticeConverter.toJoinResultDTO(notice));
     }
+
 }
