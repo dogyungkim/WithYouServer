@@ -41,12 +41,13 @@ public class NoticeConverter {
                 .build();
     }
 
-    public static NoticeCheckResponseDTO.ShortResponseDto toSearch(Notice notice, int checkNum){
+    public static NoticeCheckResponseDTO.ShortResponseDto toSearch(Notice notice, int checkNum ,boolean isChecked){
         return NoticeCheckResponseDTO.ShortResponseDto.builder()
                 .noticeId(notice.getId())
                 .content(notice.getContent())
                 .url(notice.getMember().getImageUrl())
                 .checkNum(checkNum)
+                .isChecked(isChecked)
                 .name(notice.getMember().getName())
                 .build();
     }

@@ -39,21 +39,29 @@ public class NoticeCommandServiceImpl implements NoticeCommandService{
     }
 
     @Override
-    public List<NoticeCheckResponseDTO.ShortResponseDto> getDateNotice(Long travelId){
+    public List<NoticeCheckResponseDTO.ShortResponseDto> getDateNotice(Long travelId, Long memberId) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(()->new CommonErrorHandler(ErrorStatus.TRAVEL_LOG_NOT_FOUND));
-        int states=travel.getStatus().ordinal();
+                .orElseThrow(() -> new CommonErrorHandler(ErrorStatus.TRAVEL_LOG_NOT_FOUND));
+        int states = travel.getStatus().ordinal();
 
         List<NoticeCheckResponseDTO.ShortResponseDto> results = new ArrayList<>();
-        List<Notice> notices=noticeRepositoryCustom.findByTravelLogFetchJoinMember(travelId);
+        List<Notice> notices = noticeRepositoryCustom.findByTravelLogFetchJoinMember(travelId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CommonErrorHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        for(Notice notice : notices){
-            if (notice.getState()!=states)
+        for (Notice notice : notices) {
+            if (notice.getState() != states)
                 continue;
 
-            List<NoticeCheck> noticeChecks=noticeCheckRepository.findAllByIsCheckedIsTrueAndNotice(notice);
+            List<NoticeCheck> noticeChecks = noticeCheckRepository.findAllByIsCheckedIsTrueAndNotice(notice);
+            int checkCount = noticeChecks.size();
 
-            NoticeCheckResponseDTO.ShortResponseDto check = NoticeConverter.toSearch(notice, noticeChecks.size());
+            // 사용자가 체크했는지 여부를 확인
+            boolean isChecked = noticeCheckRepository.findByMemberAndNotice(member, notice)
+                    .map(NoticeCheck::isChecked)
+                    .orElse(false);
+
+            NoticeCheckResponseDTO.ShortResponseDto check = NoticeConverter.toSearch(notice, checkCount, isChecked);
             results.add(check);
         }
         return results;
@@ -61,16 +69,25 @@ public class NoticeCommandServiceImpl implements NoticeCommandService{
 
 
     @Override
-    public List<NoticeCheckResponseDTO.ShortResponseDto> getTravelNotice(Long travelId){
+    public List<NoticeCheckResponseDTO.ShortResponseDto> getTravelNotice(Long travelId , Long memberId){
         List<NoticeCheckResponseDTO.ShortResponseDto> results = new ArrayList<>();
         List<Notice> notices=noticeRepositoryCustom.findByTravelLogFetchJoinMember(travelId);
 
-        for(Notice notice : notices){
-            List<NoticeCheck> noticeChecks=noticeCheckRepository
-                    .findAllByIsCheckedIsTrueAndNotice(notice);
+        for (Notice notice : notices) {
+            List<NoticeCheck> noticeChecks = noticeCheckRepository.findAllByIsCheckedIsTrueAndNotice(notice);
+            int checkCount = noticeChecks.size();
 
-            NoticeCheckResponseDTO.ShortResponseDto check = NoticeConverter.toSearch(notice, noticeChecks.size());
-            results.add(check);
+            // 여기에 사용자가 체크했는지 여부를 포함
+            boolean isChecked = false;
+            for (NoticeCheck noticeCheck : noticeChecks) {
+                if (noticeCheck.getMember().getId().equals(memberId)) {
+                    isChecked = true;
+                    break;
+                }
+            }
+
+            NoticeCheckResponseDTO.ShortResponseDto dto = NoticeConverter.toSearch(notice, checkCount, isChecked);
+            results.add(dto);
         }
         return results;
     }

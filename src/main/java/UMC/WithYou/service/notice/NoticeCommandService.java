@@ -17,7 +17,7 @@ public interface NoticeCommandService {
 
     Notice getNotice(Long noticeId);
 
-    List<NoticeCheckResponseDTO.ShortResponseDto> getTravelNotice(Long travelId);
+    List<NoticeCheckResponseDTO.ShortResponseDto> getTravelNotice(Long travelId, Long memberId);
 
-    List<NoticeCheckResponseDTO.ShortResponseDto> getDateNotice(Long travelId);
+    List<NoticeCheckResponseDTO.ShortResponseDto> getDateNotice(Long travelId , Long memberId);
 }

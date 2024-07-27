@@ -1,7 +1,9 @@
 package UMC.WithYou.controller;
 
+import UMC.WithYou.common.annotation.AuthorizedMember;
 import UMC.WithYou.common.apiPayload.ApiResponse;
 import UMC.WithYou.converter.NoticeConverter;
+import UMC.WithYou.domain.member.Member;
 import UMC.WithYou.domain.notice.Notice;
 import UMC.WithYou.dto.notice.NoticeCheckResponseDTO;
 import UMC.WithYou.dto.notice.NoticeRequestDTO;
@@ -79,8 +81,8 @@ public class NoticeController {
     @Parameters({
             @Parameter(name = "logId", description = "travel log 의 아이디, path variable 입니다!"),
     })
-    public ApiResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getTravelNotice(@PathVariable Long travelId){
-        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeCommandService.getTravelNotice(travelId);
+    public ApiResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getTravelNotice(@PathVariable Long travelId, @AuthorizedMember Member member){
+        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeCommandService.getTravelNotice(travelId , member.getId());
         return ApiResponse.onSuccess(notices);
     }
 
@@ -93,8 +95,8 @@ public class NoticeController {
     @Parameters({
             @Parameter(name = "logId", description = "travel log 의 아이디, path variable 입니다!"),
     })
-    public ApiResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getDateNotice(@PathVariable Long travelId){
-        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeCommandService.getDateNotice(travelId);
+    public ApiResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getDateNotice(@PathVariable Long travelId , @AuthorizedMember Member member){
+        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeCommandService.getDateNotice(travelId , member.getId());
         return ApiResponse.onSuccess(notices);
     }
 

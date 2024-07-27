@@ -27,6 +27,7 @@ public class NoticeCheckResponseDTO {
         String name;      //공지 쓴 멤버 이름
         String content;
         int checkNum;
+        boolean isChecked;
     }
 
     @Getter
