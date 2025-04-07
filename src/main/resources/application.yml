@@ -1,32 +1,10 @@
 server:
   port: 8080
-  #servlet:
-  #context-path: /api
+
 spring:
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+  application:
+    name: yongjibus
   profiles:
-    active: dev, oauth
-  datasource:
-    hikari:
-      minimum-idle: 22
-      maximum-pool-size: 22
-  data:
-    redis:
-      host: ENC(BmVFNh6evAsOpejjYfA35Q==)
-      port: 6379
-
-jwt:
-  secret: ENC(7bmxJEYMUVIrgCM+TkClZaX2DDLqzKTO6Jp9C1fZg5a/aPvxz4tPpbbzF2cUqyjDJ3nThdVqepw=)
-  expiration-period: ENC(rhU/5h9od5+FKCuh5iIeJA==)
-  header: ENC(i+cGKdSqtE6rebBZswksr1Uu9O58DNYx)
-  prefix: ENC(U+nfPN7QOj1ohWCXahSheA==)
-  refresh:
-    expiration-period: ENC(DpdQuzNXc24kB4v0qJkDUA==)
-
-jasypt:
-  encryptor:
-    bean: jasyptEncryptor
-    password: ${ENCRYPT_KEY}
+    active: local
+  # config:
+  #   import: optional:file:.env[.properties]

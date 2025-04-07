@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  withyou-app:
+    image: prunsoli/withyou-test:0.0.1
+    container_name: withyou-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    depends_on:
+      - redis
+    networks:
+      - withyou-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: withyou-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - withyou-network
+    restart: unless-stopped
+
+networks:
+  withyou-network:
+    driver: bridge
+
+volumes:
+  redis-data:

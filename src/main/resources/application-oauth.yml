@@ -1,6 +1,0 @@
-kakao:
-  client-id: ENC(0kHeeJLT7YipFGKzRZIUGGym6ebYP15sbguoYQLx9gfB69znMKggvXyaZtmwEShv)
-  redirect-uri: ENC(V6HEXM2mXG9FzrqGwU4GlcyuQBoY73SGxrkFde8NP6Q0S0RNX4n3ccOykjwljzRcsEqjLCcCMOQ=)
-
-apple:
-  client-id: ENC(ENWcTVhJXRJOTdhRRsQB7aScNpFnjQy8)

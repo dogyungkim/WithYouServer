@@ -1,11 +1,10 @@
 package UMC.WithYou.common.resolver;
 
 import UMC.WithYou.common.annotation.AuthorizedMember;
-import UMC.WithYou.domain.auth.UserPrincipal;
-import UMC.WithYou.domain.member.Email;
-import UMC.WithYou.domain.member.Identifier;
-import UMC.WithYou.domain.member.Member;
-import UMC.WithYou.repository.member.MemberRepository;
+import UMC.WithYou.feature.auth.domain.UserPrincipal;
+import UMC.WithYou.feature.member.domain.Identifier;
+import UMC.WithYou.feature.member.domain.Member;
+import UMC.WithYou.feature.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;

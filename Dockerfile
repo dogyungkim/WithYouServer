@@ -1,11 +1,12 @@
-# 최종 실행 이미지
-FROM alpine:3.18.4
+# 빌드 스테이지
+FROM gradle:7.6-jdk17 AS build
+WORKDIR /app
+COPY . .
+RUN gradle build --no-daemon -x test
 
-# Java 설치
-RUN apk add --no-cache openjdk17
-
-# 애플리케이션 파일을 컨테이너에 복사
-COPY build/libs/WithYou-0.0.1-SNAPSHOT.jar app.jar
-
-# 애플리케이션 실행
-CMD ["java", "-jar", "/app.jar"]
+# 실행 스테이지
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/build/libs/WithYou-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+CMD ["java", "-jar", "/app/app.jar"]

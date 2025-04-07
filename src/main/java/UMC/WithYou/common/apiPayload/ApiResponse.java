@@ -26,7 +26,7 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, SuccessStatus._OK.getCode() , SuccessStatus._OK.getMessage(), result);
     }
 
-    public static ApiResponse onSuccess_NoContent() {
+    public static ApiResponse<Void> onSuccess_NoContent() {
         return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
     }
 

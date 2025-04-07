@@ -1,8 +1,8 @@
 package UMC.WithYou.common.validation.validator;
 
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
-import UMC.WithYou.repository.notice.NoticeRepository;
 import UMC.WithYou.common.validation.annotation.ExistNotices;
+import UMC.WithYou.feature.notice.repository.NoticeRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;

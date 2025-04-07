@@ -1,0 +1,61 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 22
+      maximum-pool-size: 22
+  sql:
+    init:
+      mode: always
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        hbm2ddl:
+          auto: update
+        default_batch_fetch_size: 1000
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-period: ${JWT_EXPIRATION_PERIOD}
+  header: ${JWT_HEADER}
+  prefix: ${JWT_PREFIX}
+  refresh:
+    expiration-period: ${JWT_REFRESH_EXPIRATION_PERIOD}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    stack.auto: false
+    region.static: ${AWS_REGION}
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
+
+apple:
+  client-id: ${APPLE_CLIENT_ID}

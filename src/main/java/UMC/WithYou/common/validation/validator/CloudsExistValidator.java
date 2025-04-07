@@ -2,9 +2,7 @@ package UMC.WithYou.common.validation.validator;
 
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
 import UMC.WithYou.common.validation.annotation.ExistClouds;
-import UMC.WithYou.common.validation.annotation.ExistNotices;
-import UMC.WithYou.repository.cloud.CloudRepository;
-import UMC.WithYou.repository.notice.NoticeRepository;
+import UMC.WithYou.feature.cloud.repository.CloudRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,5 @@
 package UMC.WithYou.support;
 
-import UMC.WithYou.service.auth.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import UMC.WithYou.feature.auth.service.TokenProvider;
 
 import java.io.IOException;
 

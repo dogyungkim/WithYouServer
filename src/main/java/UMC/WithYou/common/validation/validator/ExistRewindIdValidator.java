@@ -2,7 +2,7 @@ package UMC.WithYou.common.validation.validator;
 
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
 import UMC.WithYou.common.validation.annotation.ExistRewindId;
-import UMC.WithYou.service.rewind.RewindQueryService;
+import UMC.WithYou.feature.rewind.service.RewindQueryService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
