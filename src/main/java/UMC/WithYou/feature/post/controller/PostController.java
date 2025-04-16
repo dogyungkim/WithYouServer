@@ -1,7 +1,7 @@
 package UMC.WithYou.feature.post.controller;
 
 import UMC.WithYou.common.annotation.AuthorizedMember;
-import UMC.WithYou.common.apiPayload.ApiResponse;
+import UMC.WithYou.common.apiPayload.WithUResponse;
 import UMC.WithYou.feature.member.domain.Member;
 import UMC.WithYou.feature.post.controller.dto.PostRequest.*;
 import UMC.WithYou.feature.post.controller.dto.PostResponse.*;
@@ -40,7 +40,7 @@ public class PostController {
             @Parameter( name = "travelId" , description = "여행 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PostMapping("api/v1/travels/{travelId}/posts")
-    public ApiResponse<PublishResponse> publishPost(
+    public WithUResponse<PublishResponse> publishPost(
             @AuthorizedMember Member member,
             @PathVariable("travelId") Long travelId,
             @RequestPart PublishRequestDTO request,
@@ -49,7 +49,7 @@ public class PostController {
         String text = request.getText();
 
         Long postId = postService.createPost(member, travelId, text, mediaList);
-        return ApiResponse.onSuccess(new PublishResponse(postId));
+        return WithUResponse.onSuccess(new PublishResponse(postId));
     }
 
 
@@ -58,10 +58,10 @@ public class PostController {
             @Parameter( name = "travelId" , description = "여행 Id", required = true, schema = @Schema(type = "Long"))
     })
     @GetMapping("api/v1/travels/{travelId}/posts")
-    public ApiResponse<List<ThumbnailResponseDTO>> getPostThumbnails(@PathVariable("travelId") Long travelId){
+    public WithUResponse<List<ThumbnailResponseDTO>> getPostThumbnails(@PathVariable("travelId") Long travelId){
         List<Post> posts = postService.getScrapedPosts(travelId);
 
-        return ApiResponse.onSuccess(posts.stream()
+        return WithUResponse.onSuccess(posts.stream()
                 .map(p -> new ThumbnailResponseDTO(p))
                 .toList()
         );
@@ -73,12 +73,12 @@ public class PostController {
             @Parameter( name = "postId" , description = "게시글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @GetMapping("api/v1/posts/{postId}")
-    public ApiResponse<PostResponseDTO> getPost(
+    public WithUResponse<PostResponseDTO> getPost(
             @PathVariable("postId") Long postId
     ){
 
         Post post = postService.getPost(postId);
-        return ApiResponse.onSuccess(new PostResponseDTO(post));
+        return WithUResponse.onSuccess(new PostResponseDTO(post));
     }
 
 
@@ -89,13 +89,13 @@ public class PostController {
             @Parameter( name = "postId" , description = "게시글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @DeleteMapping("api/v1/posts/{postId}")
-    public ApiResponse<DeletionResponseDTO> deletePost(
+    public WithUResponse<DeletionResponseDTO> deletePost(
             @AuthorizedMember Member member,
             @PathVariable("postId") Long postId
     ){
         postService.deletePost(member, postId);
 
-        return ApiResponse.onSuccess(new DeletionResponseDTO(postId));
+        return WithUResponse.onSuccess(new DeletionResponseDTO(postId));
     }
 
 
@@ -107,7 +107,7 @@ public class PostController {
     })
 
     @PatchMapping("api/v1/posts/{postId}")
-    public ApiResponse<EditResponseDTO> editPost(
+    public WithUResponse<EditResponseDTO> editPost(
             @AuthorizedMember Member member,
             @PathVariable("postId") Long postId,
             @RequestBody EditRequestDTO request
@@ -115,7 +115,7 @@ public class PostController {
         String text = request.getText();
         Map<Long, Integer> newPositions = request.getNewPositions();
         Post post = postService.editPost(member, postId, text, newPositions);
-        return ApiResponse.onSuccess(new EditResponseDTO(post.getId()));
+        return WithUResponse.onSuccess(new EditResponseDTO(post.getId()));
     }
 
 
@@ -127,12 +127,12 @@ public class PostController {
             @Parameter( name = "postId" , description = "게시글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PostMapping("api/v1/posts/{postId}")
-    public ApiResponse<ScrapeResponseDTO> scrapPost(
+    public WithUResponse<ScrapeResponseDTO> scrapPost(
             @AuthorizedMember Member member,
             @PathVariable("postId") Long postId
     ){
         Boolean isScraped = postService.toggleScrap(member, postId);
-        return ApiResponse.onSuccess(new ScrapeResponseDTO(postId, isScraped));
+        return WithUResponse.onSuccess(new ScrapeResponseDTO(postId, isScraped));
     }
 
     @Operation(summary = "회원이 스크랩한 모든 게시글 조회")
@@ -141,12 +141,12 @@ public class PostController {
             @Parameter(name = "member", hidden = true),
     })
     @GetMapping("api/v1/posts")
-    public ApiResponse<List<ThumbnailResponseDTO>> getScrapedPosts(
+    public WithUResponse<List<ThumbnailResponseDTO>> getScrapedPosts(
             @AuthorizedMember Member member
     ){
         List<Post> posts = postService.getScrapedPosts(member);
 
-        return ApiResponse.onSuccess(
+        return WithUResponse.onSuccess(
                 posts.stream()
                         .map(p -> new ThumbnailResponseDTO(p))
                         .toList()

@@ -13,8 +13,8 @@ public class TravelResponseDTO {
 
     @Getter
     @AllArgsConstructor
-    public static class ConfigurationResponseDTO {
-        private Long travelId;
+    public static class CreateTravelResponseDTO {
+        private String url;
     }
 
     @Getter
@@ -43,7 +43,7 @@ public class TravelResponseDTO {
         public TravelerResponseDTO(Member member){
             this.memberId = member.getId();
             this.name = member.getName();;
-            this.imageUrl = member.getImageUrl();
+            this.imageUrl = member.getProfileImageKey();
         }
     }
 
@@ -77,6 +77,12 @@ public class TravelResponseDTO {
         private Long travelId;
         private Long memberId;
 
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class EditTravelResponseDTO{
+        private String url;
     }
 
 }

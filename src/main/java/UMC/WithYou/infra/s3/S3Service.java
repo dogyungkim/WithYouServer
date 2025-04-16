@@ -1,4 +1,4 @@
-package UMC.WithYou;
+package UMC.WithYou.infra.s3;
 
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
 import UMC.WithYou.common.apiPayload.exception.handler.CommonErrorHandler;
@@ -33,7 +33,8 @@ public class S3Service {
 
         try (InputStream inputStream = file.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, storageFileName, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicReadWrite));
+                    //.withCannedAcl(CannedAccessControlList.PublicReadWrite));
+            );
         } catch (IOException e) {
             throw new CommonErrorHandler(ErrorStatus._PICTURE);
         }
@@ -49,7 +50,8 @@ public class S3Service {
 
         try (InputStream inputStream = media.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicReadWrite));
+                    //.withCannedAcl(CannedAccessControlList.PublicReadWrite));
+            );
         } catch (IOException e) {
             throw new CommonErrorHandler(ErrorStatus._PICTURE);
         }

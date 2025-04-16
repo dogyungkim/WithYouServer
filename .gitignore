@@ -41,6 +41,7 @@ out/
 
 ### Secret ###
 application-local.yml
+application-test.yml
 .env
 
 ### Generated Q classes ###

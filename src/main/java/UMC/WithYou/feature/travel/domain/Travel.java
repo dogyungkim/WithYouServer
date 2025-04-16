@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @AllArgsConstructor
@@ -34,8 +35,8 @@ public class Travel extends BaseEntity {
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
+    @Setter
     private String imageUrl;
-    private String imageFileName;
 
     @Enumerated(EnumType.STRING)
     private TravelStatus status;
@@ -50,21 +51,17 @@ public class Travel extends BaseEntity {
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
     private List<Rewind> rewinds;
 
-    public Travel(Member member, String title, LocalDate startDate, LocalDate endDate, String url, String imageFileName) {
+    public Travel(Member member, String title, LocalDate startDate, LocalDate endDate) {
         this.member = member;
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.imageUrl = url;
-        this.imageFileName = imageFileName;
     }
 
-    public void edit(String title, LocalDate startDate, LocalDate endDate, String url, String imageFileName){
+    public void edit(String title, LocalDate startDate, LocalDate endDate){
         this.title = title;
         this.startDate =startDate;
         this.endDate = endDate;
-        this.imageUrl = url;
-        this.imageFileName = imageFileName;
     }
 
 

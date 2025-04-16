@@ -1,6 +1,6 @@
 package UMC.WithYou.feature.packingItem.controller;
 
-import UMC.WithYou.common.apiPayload.ApiResponse;
+import UMC.WithYou.common.apiPayload.WithUResponse;
 import UMC.WithYou.feature.packingItem.controller.PackingItemRequest.*;
 import UMC.WithYou.feature.packingItem.controller.PackingItemResponse.*;
 import UMC.WithYou.feature.packingItem.domain.PackingItem;
@@ -32,14 +32,14 @@ public class PackingItemController {
             @Parameter(name = "travelId", description = "path variable: 짐 목록을 추가할 여행 로그 아이디"),
     })
     @PostMapping("api/v1/travels/{travelId}/packing_items")
-    public ApiResponse<AdditionResponseDTO> addPackingItem(
+    public WithUResponse<AdditionResponseDTO> addPackingItem(
             @PathVariable @Valid Long travelId,
             @RequestBody @Valid AdditionRequestDTO additionRequestDTO){
         String itemName = additionRequestDTO.getItemName();
         PackingItem packingItem = packingItemService.addPackingItem(travelId, itemName);
 
 
-        return ApiResponse.onSuccess(AdditionResponseDTO
+        return WithUResponse.onSuccess(AdditionResponseDTO
                 .builder()
                 .packingItemId(packingItem.getId())
                 .build());
@@ -50,10 +50,10 @@ public class PackingItemController {
             @Parameter(name = "travelId", description = "path variable: 짐 목록을 조회할 여행 로그 아이디"),
     })
     @GetMapping("api/v1/travels/{travelId}/packing_items")
-    public ApiResponse<List<SearchResponseDTO>> getPackingItems(@PathVariable Long travelId){
+    public WithUResponse<List<SearchResponseDTO>> getPackingItems(@PathVariable Long travelId){
         List<PackingItem> packingItems = packingItemService.findPackingItems(travelId);
 
-        return ApiResponse.onSuccess(packingItems.stream()
+        return WithUResponse.onSuccess(packingItems.stream()
                 .map(m -> new SearchResponseDTO(m))
                 .toList());
 
@@ -65,10 +65,10 @@ public class PackingItemController {
             @Parameter(name = "packingItemId", description = "path variable: 삭제할 짐 id"),
     })
     @DeleteMapping("api/v1/packing_items/{packingItemId}")
-    public ApiResponse<DeletionResponseDTO> deletePackingItem(@PathVariable Long packingItemId){
+    public WithUResponse<DeletionResponseDTO> deletePackingItem(@PathVariable Long packingItemId){
         packingItemService.deletePackingItem(packingItemId);
 
-        return ApiResponse.onSuccess(new DeletionResponseDTO(packingItemId));
+        return WithUResponse.onSuccess(new DeletionResponseDTO(packingItemId));
     }
 
 
@@ -79,11 +79,11 @@ public class PackingItemController {
             @Parameter(name = "packer_id", description = "query string: 짐 담당 회원 id")
     })
     @PatchMapping("api/v1/packing_items/{packingItemId}/packer_choice")
-    public ApiResponse<PackerChoiceResponseDTO> choosePacker(
+    public WithUResponse<PackerChoiceResponseDTO> choosePacker(
         @PathVariable Long packingItemId, @RequestParam("packer_id") Long packerId)
     {
         Boolean checkboxState = packingItemService.setPacker(packingItemId, packerId);
-        return ApiResponse.onSuccess(new PackerChoiceResponseDTO(packingItemId, packerId, checkboxState));
+        return WithUResponse.onSuccess(new PackerChoiceResponseDTO(packingItemId, packerId, checkboxState));
     }
 
 
@@ -92,9 +92,9 @@ public class PackingItemController {
             @Parameter(name = "packingItemId", description = "path variable: 토글할 짐 id"),
     })
     @PatchMapping("api/v1/packing_items/{packingItemId}")
-    public ApiResponse<ToggleResponseDTO> toggleCheckbox(@PathVariable Long packingItemId){
+    public WithUResponse<ToggleResponseDTO> toggleCheckbox(@PathVariable Long packingItemId){
         Boolean checkboxState = packingItemService.toggleCheckbox(packingItemId);
-        return ApiResponse.onSuccess(new ToggleResponseDTO(packingItemId, checkboxState));
+        return WithUResponse.onSuccess(new ToggleResponseDTO(packingItemId, checkboxState));
     }
 
 }

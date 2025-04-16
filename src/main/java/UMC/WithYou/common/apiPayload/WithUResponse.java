@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
-public class ApiResponse<T> {
+public class WithUResponse<T> {
 
     @JsonProperty("isSuccess")
     private final Boolean isSuccess;
@@ -22,21 +22,21 @@ public class ApiResponse<T> {
 
 
     // generate Response for Success
-    public static <T> ApiResponse<T> onSuccess(T result){
-        return new ApiResponse<>(true, SuccessStatus._OK.getCode() , SuccessStatus._OK.getMessage(), result);
+    public static <T> WithUResponse<T> onSuccess(T result){
+        return new WithUResponse<>(true, SuccessStatus._OK.getCode() , SuccessStatus._OK.getMessage(), result);
     }
 
-    public static ApiResponse<Void> onSuccess_NoContent() {
-        return new ApiResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
+    public static WithUResponse<Void> onSuccess_NoContent() {
+        return new WithUResponse<>(true, SuccessStatus._OK.getCode(), SuccessStatus._OK.getMessage(), null);
     }
 
-    public static <T> ApiResponse<T> of(BaseCode code, T result){
-        return new ApiResponse<>(true, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result);
+    public static <T> WithUResponse<T> of(BaseCode code, T result){
+        return new WithUResponse<>(true, code.getReasonHttpStatus().getCode() , code.getReasonHttpStatus().getMessage(), result);
     }
 
 
     // generate Response for Failure
-    public static <T> ApiResponse<T> onFailure(String code, String message, T data){
-        return new ApiResponse<>(false, code, message, data);
+    public static <T> WithUResponse<T> onFailure(String code, String message, T data){
+        return new WithUResponse<>(false, code, message, data);
     }
 }

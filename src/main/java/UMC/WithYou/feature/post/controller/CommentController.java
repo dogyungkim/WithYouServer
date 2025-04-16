@@ -2,7 +2,7 @@ package UMC.WithYou.feature.post.controller;
 
 
 import UMC.WithYou.common.annotation.AuthorizedMember;
-import UMC.WithYou.common.apiPayload.ApiResponse;
+import UMC.WithYou.common.apiPayload.WithUResponse;
 import UMC.WithYou.feature.member.domain.Member;
 import UMC.WithYou.feature.post.controller.dto.CommentRequest.*;
 import UMC.WithYou.feature.post.controller.dto.CommentResponse.*;
@@ -37,14 +37,14 @@ public class CommentController {
             @Parameter( name = "postId" , description = "게시글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PostMapping("api/v1/posts/{postId}/comments")
-    public ApiResponse<WriteResponseDTO> writeComment(
+    public WithUResponse<WriteResponseDTO> writeComment(
             @AuthorizedMember Member member,
             @PathVariable @Valid Long postId,
             @RequestBody @Valid WriteRequestDTO request){
 
         String content = request.getContent();
         Comment comment = commentService.writeComment(member, postId, content);
-        return ApiResponse.onSuccess(new WriteResponseDTO(comment));
+        return WithUResponse.onSuccess(new WriteResponseDTO(comment));
     }
 
 
@@ -55,12 +55,12 @@ public class CommentController {
             @Parameter( name = "commentId" , description = "댓글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @DeleteMapping("api/v1/comments/{commentId}")
-    public ApiResponse<DeletionResponseDTO> deleteComment(
+    public WithUResponse<DeletionResponseDTO> deleteComment(
             @AuthorizedMember Member member,
             @PathVariable @Valid Long commentId){
 
         commentService.deleteComment(member, commentId);
-        return ApiResponse.onSuccess(new DeletionResponseDTO(commentId));
+        return WithUResponse.onSuccess(new DeletionResponseDTO(commentId));
     }
 
 
@@ -73,7 +73,7 @@ public class CommentController {
             @Parameter( name = "commentId" , description = "댓글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PatchMapping("api/v1/comments/{commentId}")
-    public ApiResponse<EditResponseDTO> editComment(
+    public WithUResponse<EditResponseDTO> editComment(
             @AuthorizedMember Member member,
             @PathVariable @Valid Long commentId,
             @RequestBody @Valid EditRequestDTO request){
@@ -81,7 +81,7 @@ public class CommentController {
         String content = request.getContent();
         Comment comment = commentService.editComment(member, commentId, content);
 
-        return ApiResponse.onSuccess(new EditResponseDTO(comment));
+        return WithUResponse.onSuccess(new EditResponseDTO(comment));
     }
 
 

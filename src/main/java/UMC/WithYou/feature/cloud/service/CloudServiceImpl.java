@@ -1,6 +1,5 @@
 package UMC.WithYou.feature.cloud.service;
 
-import UMC.WithYou.S3Service;
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
 import UMC.WithYou.common.apiPayload.exception.handler.CommonErrorHandler;
 import UMC.WithYou.feature.cloud.controller.CloudRequestDTO;
@@ -13,6 +12,7 @@ import UMC.WithYou.feature.cloud.repository.CloudMediaRepository;
 import UMC.WithYou.feature.cloud.repository.CloudRepository;
 import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.repository.TravelRepository;
+import UMC.WithYou.infra.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

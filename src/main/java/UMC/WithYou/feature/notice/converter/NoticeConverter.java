@@ -45,7 +45,7 @@ public class NoticeConverter {
         return NoticeCheckResponseDTO.ShortResponseDto.builder()
                 .noticeId(notice.getId())
                 .content(notice.getContent())
-                .url(notice.getMember().getImageUrl())
+                .url(notice.getMember().getProfileImageKey())
                 .checkNum(checkNum)
                 .isChecked(isChecked)
                 .name(notice.getMember().getName())

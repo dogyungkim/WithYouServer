@@ -1,7 +1,7 @@
 package UMC.WithYou.feature.post.controller;
 
 import UMC.WithYou.common.annotation.AuthorizedMember;
-import UMC.WithYou.common.apiPayload.ApiResponse;
+import UMC.WithYou.common.apiPayload.WithUResponse;
 import UMC.WithYou.feature.member.domain.Member;
 import UMC.WithYou.feature.post.controller.dto.ReplyRequest.*;
 import UMC.WithYou.feature.post.controller.dto.ReplyResponse.*;
@@ -37,7 +37,7 @@ public class ReplyController {
     })
 
     @PostMapping("api/v1/comments/{commentId}/replies")
-    public ApiResponse<WriteResponseDTO> writeReply(
+    public WithUResponse<WriteResponseDTO> writeReply(
             @AuthorizedMember Member member,
             @PathVariable @Valid Long commentId,
             @RequestBody WriteRequestDTO request
@@ -45,7 +45,7 @@ public class ReplyController {
         String content = request.getContent();
         Reply reply = replyService.writeReply(member, commentId, content);
 
-        return ApiResponse.onSuccess(new WriteResponseDTO(reply));
+        return WithUResponse.onSuccess(new WriteResponseDTO(reply));
     }
 
 
@@ -57,13 +57,13 @@ public class ReplyController {
             @Parameter( name = "replyId" , description = "대댓글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @DeleteMapping("api/v1/replies/{replyId}")
-    public ApiResponse<DeletionResponseDTO> deleteReply(
+    public WithUResponse<DeletionResponseDTO> deleteReply(
             @AuthorizedMember Member member,
             @PathVariable @Valid Long replyId
     ){
         replyService.deleteReply(member, replyId);
 
-        return ApiResponse.onSuccess(new DeletionResponseDTO(replyId));
+        return WithUResponse.onSuccess(new DeletionResponseDTO(replyId));
     }
 
 
@@ -74,14 +74,14 @@ public class ReplyController {
             @Parameter( name = "replyId" , description = "대댓글 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PatchMapping("api/v1/replies/{replyId}")
-    public ApiResponse<EditResponseDTO> editReply(
+    public WithUResponse<EditResponseDTO> editReply(
             @AuthorizedMember Member member,
             @PathVariable @Valid Long replyId,
             @RequestBody EditRequestDTO request ){
 
         String content = request.getContent();
         replyService.editReply(member, replyId, content);
-        return ApiResponse.onSuccess(new EditResponseDTO(replyId));
+        return WithUResponse.onSuccess(new EditResponseDTO(replyId));
     }
 
 }

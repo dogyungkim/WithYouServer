@@ -1,12 +1,15 @@
 package UMC.WithYou.feature.travel.controller;
 
 import java.time.LocalDate;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Getter;
 
 public class TravelRequestDTO {
 
     @Getter
-    public static class ConfigurationRequestDTO {
+    public static class EditTravelRequestDTO {
         private String title;
         private LocalDate startDate;
         private LocalDate endDate;
@@ -17,4 +20,21 @@ public class TravelRequestDTO {
     public static class JoinRequestDTO{
         private String invitationCode;
     }
+
+    @Getter
+    public static class CreatePodRequestDTO {
+        private String title;
+        private LocalDate localDate;
+        private LocalDate startDate;
+        private LocalDate endDate;
+    }
+
+    @Getter
+    public static class CreateTravelRequestDTO {
+        private String title;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private LocalDate localDate;
+    }
+    
 }

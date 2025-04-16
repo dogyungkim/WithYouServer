@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class MemberResponse {
-    private String imageUrl;
+    private String profileImageKey;
     private String name;
 
     @Builder
-    public MemberResponse(String imageUrl, String name) {
-        this.imageUrl = imageUrl;
+    public MemberResponse(String profileImageKey, String name) {
+        this.profileImageKey = profileImageKey;
         this.name = name;
     }
 }

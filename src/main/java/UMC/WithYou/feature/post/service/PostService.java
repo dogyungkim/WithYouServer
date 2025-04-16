@@ -1,6 +1,5 @@
 package UMC.WithYou.feature.post.service;
 
-import UMC.WithYou.S3Service;
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
 import UMC.WithYou.common.apiPayload.exception.handler.CommonErrorHandler;
 import UMC.WithYou.feature.member.domain.Member;
@@ -12,6 +11,7 @@ import UMC.WithYou.feature.post.repository.PostRepository;
 import UMC.WithYou.feature.post.repository.ScrapedPostRepository;
 import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.service.TravelService;
+import UMC.WithYou.infra.s3.S3Service;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;

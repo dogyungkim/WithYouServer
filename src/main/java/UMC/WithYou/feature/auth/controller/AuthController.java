@@ -1,6 +1,6 @@
 package UMC.WithYou.feature.auth.controller;
 
-import UMC.WithYou.common.apiPayload.ApiResponse;
+import UMC.WithYou.common.apiPayload.WithUResponse;
 import UMC.WithYou.feature.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,8 +24,8 @@ public class AuthController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "로그인 실패", content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = String.class)))
     })
     @PostMapping
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request) throws Exception {
-        return ApiResponse.onSuccess(authService.authenticateOrRegisterUser(request));
+    public WithUResponse<LoginResponse> login(@RequestBody LoginRequest request) throws Exception {
+        return WithUResponse.onSuccess(authService.authenticateOrRegisterUser(request));
     }
     
 }

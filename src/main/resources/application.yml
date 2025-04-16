@@ -6,5 +6,5 @@ spring:
     name: yongjibus
   profiles:
     active: local
-  # config:
-  #   import: optional:file:.env[.properties]
+  config:
+    import: optional:file:.env[.properties]

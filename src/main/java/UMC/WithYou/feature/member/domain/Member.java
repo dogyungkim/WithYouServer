@@ -34,7 +34,7 @@ public class Member extends BaseEntity {
     private List<Traveler> travelers = new ArrayList<>();
 
     @Getter
-    private String imageUrl;
+    private String profileImageKey;
 
 
     @Builder
@@ -43,7 +43,7 @@ public class Member extends BaseEntity {
         this.identifier=new Identifier(identifier);
         this.name = new Name(name);
         this.memberType=memberType;
-        this.imageUrl="";
+        this.profileImageKey="";
     }
 
     public String getEmail() {
@@ -57,8 +57,8 @@ public class Member extends BaseEntity {
         return this.name.getValue();
     }
 
-    public void updateImage(String imageUrl){
-        this.imageUrl = imageUrl;
+    public void updateImage(String profileImageKey){
+        this.profileImageKey = profileImageKey;
     }
 
     public void updateName(String name){

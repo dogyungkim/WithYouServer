@@ -1,6 +1,5 @@
 package UMC.WithYou.feature.travel.service;
 
-import UMC.WithYou.S3Service;
 import UMC.WithYou.common.apiPayload.code.status.ErrorStatus;
 import UMC.WithYou.common.apiPayload.exception.handler.CommonErrorHandler;
 import UMC.WithYou.feature.member.domain.Member;
@@ -8,6 +7,9 @@ import UMC.WithYou.feature.member.repository.MemberRepository;
 import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.domain.Traveler;
 import UMC.WithYou.feature.travel.repository.TravelRepository;
+import UMC.WithYou.infra.s3.S3FileType;
+import UMC.WithYou.infra.s3.S3PreSignService;
+import UMC.WithYou.infra.s3.S3Service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,11 +26,11 @@ public class TravelService {
     private final TravelRepository travelRepository;
     private final MemberRepository memberRepository;
     private final S3Service s3Service;
+    private final S3PreSignService s3PreSignService;
 
-    public Long createTravel(Member member, String title, LocalDate startDate, LocalDate endDate, MultipartFile bannerImage, LocalDate localDate) {
-        String fileName = s3Service.createFileName(bannerImage.getOriginalFilename());
-        String url = s3Service.uploadMedia(bannerImage, fileName);
-        Travel travel = new Travel(member, title, startDate, endDate, url, fileName);
+    public String createTravel(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate) {
+        
+        Travel travel = new Travel(member, title, startDate, endDate);
 
         travel.setTravelStatus(localDate);
 
@@ -36,7 +38,23 @@ public class TravelService {
         travel.addTravelMember(traveler);
         travelRepository.save(travel);
 
-        return travel.getId();
+        return s3PreSignService.generatePresignedUrl(member.getId().toString(), S3FileType.BANNER);
+    }
+
+    public String createTravelWithMultipartFile(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate, MultipartFile image) {
+        Travel travel = new Travel(member, title, startDate, endDate);
+
+        travel.setTravelStatus(localDate);
+
+        Traveler traveler = new Traveler(travel, member);
+
+        String imageUrl = s3Service.uploadImg(image);
+        travel.setImageUrl(imageUrl);
+
+        travel.addTravelMember(traveler);
+
+        travelRepository.save(travel);
+        return imageUrl;
     }
 
     public List<Travel> getTravels(Member member, LocalDate currentLocalDate) {
@@ -48,6 +66,9 @@ public class TravelService {
             travel.setTravelStatus(currentLocalDate);
             travels.add(travel);
         }
+        travels.forEach(t -> 
+            t.setImageUrl(s3PreSignService.generatePresignedUrl(t.getId().toString(), S3FileType.BANNER))
+        );
 
         return travels;
     }
@@ -58,26 +79,22 @@ public class TravelService {
         if (!travel.validateOwnership(member)) {
             throw new CommonErrorHandler(ErrorStatus.UNAUTHORIZED_ACCESS_TO_TRAVEL);
         }
-        ;
-        s3Service.deleteFile(travel.getImageFileName());
+        s3Service.deleteFile(travel.getImageUrl());
 
         travelRepository.delete(travel);
         return travelId;
     }
 
-    public Long editTravel(Member member, Long travelId, String title,
-                           LocalDate startDate, LocalDate endDate, MultipartFile bannerImage, LocalDate localDate) {
+    public String editTravel(Member member, Long travelId, String title,
+                           LocalDate startDate, LocalDate endDate, LocalDate localDate) {
         Travel travel = findTravelById(travelId);
 
-        s3Service.deleteFile(travel.getImageFileName());
-
-        String fileName = s3Service.createFileName(bannerImage.getOriginalFilename());
-        String url = s3Service.uploadMedia(bannerImage, fileName);
-
         validateTraveler(member, travel);
-        travel.edit(title, startDate, endDate, url, fileName);
+        travel.edit(title, startDate, endDate);
         travel.setTravelStatus(localDate);
-        return travel.getId();
+        
+        String url = s3PreSignService.generatePresignedUrl(travel.getId().toString(), S3FileType.BANNER);
+        return url;
     }
 
     public List<Member> getMembers(Member member, Long travelId) {
