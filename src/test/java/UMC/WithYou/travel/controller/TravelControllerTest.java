@@ -139,7 +139,7 @@ class TravelControllerTest {
             newTitle, newStartDate, newEndDate, testDate);
         
         String expectedUrl = "https://s3.amazonaws.com/travel-banner/123-updated.jpg";
-        when(travelService.editTravel(any(Member.class), eq(travelId), eq(newTitle), eq(newStartDate), eq(newEndDate), eq(testDate)))
+        when(travelService.editTravelWithImage(any(Member.class), eq(travelId), eq(newTitle), eq(newStartDate), eq(newEndDate), eq(testDate)))
                 .thenReturn(expectedUrl);
         
         // when & then

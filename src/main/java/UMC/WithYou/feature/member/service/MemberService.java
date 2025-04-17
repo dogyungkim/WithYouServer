@@ -19,6 +19,9 @@ public class MemberService {
     private final S3Service s3Service;
     private final S3PreSignService s3PreSignService;
     
+    /*
+     * Deprecated : getUpdateImageUrl 메서드를 사용하세요.
+     */
     @Transactional
     public void updateImage(Member member, MultipartFile imageFile){
         String imageUrl = s3Service.uploadImg(imageFile);
@@ -28,6 +31,12 @@ public class MemberService {
     @Transactional
     public void updateName(Member member, NameRequest request){
         member.updateName(request.getName());
+    }
+
+    public String getUpdateImageUrl(Member member){
+        String memberId = member.getId().toString();
+        String presignedUrl = s3PreSignService.generatePresignedUrl(memberId, S3FileType.PROFILE);
+        return presignedUrl;
     }
 
     @Transactional

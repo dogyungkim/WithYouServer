@@ -175,6 +175,29 @@ class TravelServiceTest {
             String newTitle = "수정된 여행";
             LocalDate newStartDate = today.plusDays(2);
             LocalDate newEndDate = today.plusDays(6);
+
+            // 테스트 멤버가 여행자인 상황 설정
+            Traveler traveler = TravelFixture.createTraveler(testTravel, testMember);
+            testTravel.addTravelMember(traveler);
+
+            when(travelRepository.findById(any(Long.class))).thenReturn(Optional.of(testTravel));
+
+            // when
+            travelService.editTravel(testMember, 1L, newTitle, newStartDate, newEndDate, today);
+
+            // then
+            assertThat(testTravel.getTitle()).isEqualTo(newTitle);
+            assertThat(testTravel.getStartDate()).isEqualTo(newStartDate);
+            assertThat(testTravel.getEndDate()).isEqualTo(newEndDate);
+        }
+
+        @Test
+        @DisplayName("여행 이미지와 수정 성공")
+        void editTravelWithImage_Success() {
+            // given
+            String newTitle = "수정된 여행";
+            LocalDate newStartDate = today.plusDays(2);
+            LocalDate newEndDate = today.plusDays(6);
             String expectedPresignedUrl = "https://s3.amazonaws.com/presigned-url";
 
             // 테스트 멤버가 여행자인 상황 설정
@@ -186,7 +209,7 @@ class TravelServiceTest {
                     .thenReturn(expectedPresignedUrl);
 
             // when
-            String presignedUrl = travelService.editTravel(testMember, 1L, newTitle, newStartDate, newEndDate, today);
+            String presignedUrl = travelService.editTravelWithImage(testMember, 1L, newTitle, newStartDate, newEndDate, today);
 
             // then
             assertThat(presignedUrl).isEqualTo(expectedPresignedUrl);

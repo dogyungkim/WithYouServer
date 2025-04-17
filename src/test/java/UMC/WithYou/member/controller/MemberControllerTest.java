@@ -96,4 +96,23 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.result.name").value("테스트유저"))
                 .andExpect(jsonPath("$.result.presignedUrl").value(presignedUrl));
     }
+    
+    @Test
+    @DisplayName("이미지 업데이트 프리사인드 URL 발급 테스트")
+    @WithMockCustomUser(name = "테스트유저", id = 1L)
+    void getUpdateImageUrlTest() throws Exception {
+        // given
+        String expectedPresignedUrl = "https://s3.bucket.com/user-id/profile-update.png?X-Amz-Algorithm=...";
+        
+        // when
+        when(memberService.getUpdateImageUrl(any(Member.class))).thenReturn(expectedPresignedUrl);
+        
+        // then
+        mockMvc.perform(get("/api/v1/member/image"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessStatus._OK.getCode()))
+                .andExpect(jsonPath("$.message").value(SuccessStatus._OK.getMessage()))
+                .andExpect(jsonPath("$.result").value(expectedPresignedUrl));
+    }
 }

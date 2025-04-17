@@ -15,6 +15,9 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.validator.constraints.Length;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +34,7 @@ public class Travel extends BaseEntity {
 
     @ManyToOne
     private Member member;
-
+    @Length(max = 15)
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;

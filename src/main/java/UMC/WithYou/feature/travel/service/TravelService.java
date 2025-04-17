@@ -85,15 +85,25 @@ public class TravelService {
         return travelId;
     }
 
-    public String editTravel(Member member, Long travelId, String title,
+    public void editTravel(Member member, Long travelId, String title,
                            LocalDate startDate, LocalDate endDate, LocalDate localDate) {
         Travel travel = findTravelById(travelId);
 
         validateTraveler(member, travel);
         travel.edit(title, startDate, endDate);
         travel.setTravelStatus(localDate);
-        
+    }
+
+    public String editTravelWithImage(Member member, Long travelId, String title,
+    LocalDate startDate, LocalDate endDate, LocalDate localDate) {
+        Travel travel = findTravelById(travelId);
+        validateTraveler(member, travel);
+
+        travel.edit(title, startDate, endDate);
+        travel.setTravelStatus(localDate);
+
         String url = s3PreSignService.generatePresignedUrl(travel.getId().toString(), S3FileType.BANNER);
+
         return url;
     }
 
