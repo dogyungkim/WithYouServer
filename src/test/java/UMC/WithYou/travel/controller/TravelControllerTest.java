@@ -8,6 +8,8 @@ import UMC.WithYou.feature.travel.controller.TravelController;
 import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.domain.Traveler;
 import UMC.WithYou.feature.travel.service.TravelService;
+import UMC.WithYou.infra.s3.S3PreSignService;
+import UMC.WithYou.infra.s3.S3FileType;
 import UMC.WithYou.member.MemberFixture;
 import UMC.WithYou.travel.TravelFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +45,9 @@ class TravelControllerTest {
     @MockBean
     private TravelService travelService;
 
+    @MockBean
+    private S3PreSignService s3PreSignService;
+
     private final LocalDate testDate = LocalDate.now();
 
     @Test
@@ -54,22 +59,22 @@ class TravelControllerTest {
         LocalDate startDate = testDate;
         LocalDate endDate = testDate.plusDays(7);
         
-        // DTO 객체 생성 - 직접 JSON 문자열 생성
+        // DTO 객체 생성 - JSON 직접 생성
         String requestDTOJson = String.format(
             "{\"title\":\"%s\",\"content\":\"\",\"localDate\":\"%s\",\"startDate\":\"%s\",\"endDate\":\"%s\"}",
             testTitle, testDate, startDate, endDate);
         
         String expectedUrl = "https://s3.amazonaws.com/travel-banner/123.jpg";
         when(travelService.createTravel(any(Member.class), eq(testTitle), eq(startDate), eq(endDate), eq(testDate)))
+                .thenReturn(1L);
+
+        when(s3PreSignService.generatePresignedUrl(any(String.class), eq(S3FileType.BANNER)))
                 .thenReturn(expectedUrl);
         
         // when & then
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request", "", "application/json", 
-                requestDTOJson.getBytes());
-        
-        mockMvc.perform(multipart("/api/v1/travels")
-                .file(requestPart))
+        mockMvc.perform(post("/api/v1/travels")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestDTOJson))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessStatus._OK.getCode()))
@@ -139,25 +144,17 @@ class TravelControllerTest {
             newTitle, newStartDate, newEndDate, testDate);
         
         String expectedUrl = "https://s3.amazonaws.com/travel-banner/123-updated.jpg";
-        when(travelService.editTravelWithImage(any(Member.class), eq(travelId), eq(newTitle), eq(newStartDate), eq(newEndDate), eq(testDate)))
+      //  when(travelService.editTravelWithImage(any(Member.class), eq(travelId), eq(newTitle), eq(newStartDate), eq(newEndDate), eq(testDate)));
+        when(s3PreSignService.generatePresignedUrl(any(String.class), eq(S3FileType.BANNER)))
                 .thenReturn(expectedUrl);
         
-        // when & then
-        MockMultipartFile requestPart = new MockMultipartFile(
-                "request", "", "application/json", 
-                requestDTOJson.getBytes());
-        
-        mockMvc.perform(multipart("/api/v1/travels/{travelId}", travelId)
-                .file(requestPart)
-                .with(request -> {
-                    request.setMethod("PATCH");
-                    return request;
-                }))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessStatus._OK.getCode()))
-                .andExpect(jsonPath("$.message").value(SuccessStatus._OK.getMessage()))
-                .andExpect(jsonPath("$.result.url").value(expectedUrl));
+        mockMvc.perform(patch("/api/v1/travels/{travelId}/image", travelId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestDTOJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(SuccessStatus._OK.getCode()))
+            .andExpect(jsonPath("$.message").value(SuccessStatus._OK.getMessage()))
+            .andExpect(jsonPath("$.result.url").value(expectedUrl));
     }
 
     @Test

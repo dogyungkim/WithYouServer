@@ -10,13 +10,12 @@ import UMC.WithYou.feature.travel.repository.TravelRepository;
 import UMC.WithYou.infra.s3.S3FileType;
 import UMC.WithYou.infra.s3.S3PreSignService;
 import UMC.WithYou.infra.s3.S3Service;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -28,7 +27,7 @@ public class TravelService {
     private final S3Service s3Service;
     private final S3PreSignService s3PreSignService;
 
-    public String createTravel(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate) {
+    public Long createTravel(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate) {
         
         Travel travel = new Travel(member, title, startDate, endDate);
 
@@ -36,9 +35,8 @@ public class TravelService {
 
         Traveler traveler = new Traveler(travel, member);
         travel.addTravelMember(traveler);
-        travelRepository.save(travel);
-
-        return s3PreSignService.generatePresignedUrl(member.getId().toString(), S3FileType.BANNER);
+        
+        return travelRepository.save(travel).getId();
     }
 
     public String createTravelWithMultipartFile(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate, MultipartFile image) {
@@ -58,17 +56,15 @@ public class TravelService {
     }
 
     public List<Travel> getTravels(Member member, LocalDate currentLocalDate) {
-        List<Traveler> travelers = member.getTravelers();
-        List<Travel> travels = new ArrayList<>();
+        List<Travel> travels = travelRepository.findTravelsByMemberWithFetch(member);
 
-        for (Traveler traveler : travelers) {
-            Travel travel = traveler.getTravel();
+        for (Travel travel : travels) {
             travel.setTravelStatus(currentLocalDate);
-            travels.add(travel);
         }
-        travels.forEach(t -> 
-            t.setImageUrl(s3PreSignService.generatePresignedUrl(t.getId().toString(), S3FileType.BANNER))
-        );
+        // TODO : 이미지 추가 시 주석 해제
+        // travels.forEach(t -> 
+        //     t.setImageUrl(s3PreSignService.generatePresignedUrl(t.getId().toString(), S3FileType.BANNER))
+        // );
 
         return travels;
     }
@@ -79,7 +75,10 @@ public class TravelService {
         if (!travel.validateOwnership(member)) {
             throw new CommonErrorHandler(ErrorStatus.UNAUTHORIZED_ACCESS_TO_TRAVEL);
         }
-        s3Service.deleteFile(travel.getImageUrl());
+        
+        if (travel.getImageUrl() != null) {
+            s3PreSignService.deleteFile(travel.getId().toString(), S3FileType.BANNER);
+        }
 
         travelRepository.delete(travel);
         return travelId;
@@ -94,17 +93,13 @@ public class TravelService {
         travel.setTravelStatus(localDate);
     }
 
-    public String editTravelWithImage(Member member, Long travelId, String title,
+    public void editTravelWithImage(Member member, Long travelId, String title,
     LocalDate startDate, LocalDate endDate, LocalDate localDate) {
         Travel travel = findTravelById(travelId);
         validateTraveler(member, travel);
 
         travel.edit(title, startDate, endDate);
         travel.setTravelStatus(localDate);
-
-        String url = s3PreSignService.generatePresignedUrl(travel.getId().toString(), S3FileType.BANNER);
-
-        return url;
     }
 
     public List<Member> getMembers(Member member, Long travelId) {
