@@ -52,7 +52,7 @@
 
 ## 🏛️ 아키텍처
 
-### 시스템 아키텍처
+### 서비스 아키텍처
 ![Architecture](.docs/architecture.png)
 
 ### CI/CD 파이프라인
