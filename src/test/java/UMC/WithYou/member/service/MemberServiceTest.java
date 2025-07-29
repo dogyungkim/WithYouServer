@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -69,6 +70,23 @@ class MemberServiceTest {
         verify(s3Service).uploadImg(imageFile);
         assertEquals(expectedImageUrl, memberFixture.getProfileImageKey());
     }
+
+    @Test
+    @DisplayName("회원 이미지 업데이트 성공 - s3PreSignService 호출")
+    void updateImage_Success_s3PreSignService_Call() {
+        // given
+        String expectedPresignedUrl = "https://s3.amazonaws.com/presigned-url";
+        when(s3Interface.generatePresignedUrl(anyString(), any(S3FileType.class)))
+                .thenReturn(expectedPresignedUrl);
+
+        // when
+        String url =memberService.getUpdateImageUrl(memberFixture);
+
+        // then
+        verify(s3Interface).generatePresignedUrl(memberFixture.getId().toString(), S3FileType.PROFILE);
+        assertThat(url).isEqualTo(expectedPresignedUrl);
+    }
+    
 
     @Test
     @DisplayName("회원 이름 업데이트 성공")

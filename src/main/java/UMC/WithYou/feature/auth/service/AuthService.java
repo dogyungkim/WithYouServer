@@ -30,14 +30,6 @@ public class AuthService {
     }
 
     private UserInfo getUserInfo(LoginRequest request) throws Exception {
-        if ("apple".equals(request.getProvider())) {
-            return getAppleUserInfo(request);
-        } else {
-            return oAuth2ProviderService.getUserInfo(request);
-        }
-    }
-
-    private UserInfo getAppleUserInfo(LoginRequest request) throws Exception {
         return oAuth2ProviderService.getUserInfo(request);
     }
 

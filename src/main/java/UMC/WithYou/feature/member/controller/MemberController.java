@@ -29,16 +29,27 @@ public class MemberController {
         return WithUResponse.onSuccess_NoContent();
     }
 
-    //Deprecated
-    @Operation(summary = "이미지 변경")
-    @ApiResponse(responseCode = "200", description = "이미지 업데이트 성공")
-    @ApiResponse(responseCode = "400", description = "이미지 업데이트 실패", content = @Content(schema = @Schema(implementation = String.class)))
-    @PatchMapping("/image")
-    public WithUResponse<Void> updateImage(@AuthorizedMember Member member,
-                            @RequestParam("image") @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "업데이트할 이미지 파일", required = true,
-                                    content = @Content(mediaType = "multipart/form-data", schema = @Schema(type = "string", format = "binary"))) MultipartFile imageFile) {
-        memberService.updateImage(member, imageFile);
-        return WithUResponse.onSuccess_NoContent();
+    /*
+     * Deprecated : Use memberService.getUpdateImageUrl
+     */
+    // @Operation(summary = "이미지 변경")
+    // @ApiResponse(responseCode = "200", description = "이미지 업데이트 성공")
+    // @ApiResponse(responseCode = "400", description = "이미지 업데이트 실패", content = @Content(schema = @Schema(implementation = String.class)))
+    // @PatchMapping("/image")
+    // public WithUResponse<Void> updateImage(@AuthorizedMember Member member,
+    //                         @RequestParam("image") @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "업데이트할 이미지 파일", required = true,
+    //                                 content = @Content(mediaType = "multipart/form-data", schema = @Schema(type = "string", format = "binary"))) MultipartFile imageFile) {
+    //     memberService.updateImage(member, imageFile);
+    //     return WithUResponse.onSuccess_NoContent();
+    // }
+
+    @Operation(summary = "이미지 업데이트 프리사인드 URL 발급")
+    @ApiResponse(responseCode = "200", description = "이미지 업데이트 프리사인드 URL 발급 성공")
+    @ApiResponse(responseCode = "400", description = "이미지 업데이트 프리사인드 URL 발급 실패", content = @Content(schema = @Schema(implementation = String.class)))
+    @GetMapping("/image")
+    public WithUResponse<String> getUpdateImageUrl(@AuthorizedMember Member member) {
+        String presignedUrl = memberService.getUpdateImageUrl(member);
+        return WithUResponse.onSuccess(presignedUrl);
     }
 
     @Operation(summary = "회원 정보 조회")

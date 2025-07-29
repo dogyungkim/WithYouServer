@@ -2,7 +2,7 @@ package UMC.WithYou.feature.travel.controller;
 
 import java.time.LocalDate;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.hibernate.validator.constraints.Length;
 
 import lombok.Getter;
 
@@ -23,6 +23,7 @@ public class TravelRequestDTO {
 
     @Getter
     public static class CreatePodRequestDTO {
+        @Length(max = 15)
         private String title;
         private LocalDate localDate;
         private LocalDate startDate;

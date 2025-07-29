@@ -14,7 +14,7 @@ import java.util.Objects;
 public class Name {
 
     private static final int MIN_LENGTH = 1;
-    private static final int MAX_LENGTH = 255;
+    private static final int MAX_LENGTH = 12;
 
     @Column(name = "name", nullable = false)
     private String value;
