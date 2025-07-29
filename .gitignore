@@ -46,3 +46,8 @@ application-test.yml
 
 ### Generated Q classes ###
 src/main/generated/
+*.sql
+
+xLoadTest/
+docker-compose.yml
+/.gemini
