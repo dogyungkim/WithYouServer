@@ -57,8 +57,6 @@
 
 
 ## 🏛️ 아키텍처
-
-### 서비스 아키텍처
 <img width="1101" height="620" alt="서비스 아키텍처" src="https://github.com/user-attachments/assets/b1a99e9d-7fd7-4b00-9e0d-3deb4cc51be3" />
 
 ## 📁 디렉토리 구조
