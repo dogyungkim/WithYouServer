@@ -1,34 +1,51 @@
+# version: '3.8'
+
+# services:
+#   withyou-app:
+#     image: prunsoli/withyou-test:0.0.1
+#     container_name: withyou-app
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=local
+#     depends_on:
+#       - redis
+#     networks:
+#       - withyou-network
+#     restart: unless-stopped
+
+#   redis:
+#     image: redis:7-alpine
+#     container_name: withyou-redis
+#     ports:
+#       - "6379:6379"
+#     volumes:
+#       - redis-data:/data
+#     command: redis-server --appendonly yes
+#     networks:
+#       - withyou-network
+#     restart: unless-stopped
+
+# networks:
+#   withyou-network:
+#     driver: bridge
+
+# volumes:
+#   redis-data:
+
 version: '3.8'
 
 services:
-  withyou-app:
-    image: prunsoli/withyou-test:0.0.1
-    container_name: withyou-app
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
     ports:
-      - "8080:8080"
+      - "8086:8086"
     environment:
-      - SPRING_PROFILES_ACTIVE=local
-    depends_on:
-      - redis
-    networks:
-      - withyou-network
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: withyou-redis
-    ports:
-      - "6379:6379"
+      - INFLUXDB_DB=k6
+      - INFLUXDB_ADMIN_ENABLED=true
     volumes:
-      - redis-data:/data
-    command: redis-server --appendonly yes
-    networks:
-      - withyou-network
-    restart: unless-stopped
-
-networks:
-  withyou-network:
-    driver: bridge
+      - influxdb-storage:/var/lib/influxdb
 
 volumes:
-  redis-data:
+  influxdb-storage:

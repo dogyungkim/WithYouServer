@@ -28,7 +28,6 @@ public class NoticeCheck extends BaseEntity {
     private Member member;    //체크한 사람
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="notice_id")
     private Notice notice;
 
     public void changeStatus() {

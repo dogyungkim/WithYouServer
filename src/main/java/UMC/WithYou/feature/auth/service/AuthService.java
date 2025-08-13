@@ -66,4 +66,11 @@ public class AuthService {
                 .memberType(MemberType.BASIC_USER)
                 .build());
     }
+
+    @Transactional
+    public LoginResponse generateTestToken(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find member with id: " + memberId));
+        return createLoginResponse(member);
+    }
 }

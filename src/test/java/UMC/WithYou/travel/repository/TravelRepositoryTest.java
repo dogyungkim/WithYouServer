@@ -209,12 +209,12 @@ class TravelRepositoryTest {
         
         // then
         assertThat(foundUpcoming).isPresent();
-        assertThat(foundUpcoming.get().getStatus()).isEqualTo(TravelStatus.UPCOMING);
+        assertThat(foundUpcoming.get().getStatus()).isEqualTo(TravelStatus.BEFORE);
         
         assertThat(foundOngoing).isPresent();
         assertThat(foundOngoing.get().getStatus()).isEqualTo(TravelStatus.ONGOING);
         
         assertThat(foundBygone).isPresent();
-        assertThat(foundBygone.get().getStatus()).isEqualTo(TravelStatus.BYGONE);
+        assertThat(foundBygone.get().getStatus()).isEqualTo(TravelStatus.AFTER);
     }
 }

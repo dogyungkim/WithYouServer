@@ -39,4 +39,18 @@ public class S3Test {
             throw new AssertionError("생성된 URL이 유효한 형식이 아닙니다: " + presignedUrl, e);
         }
     }
+    
+    @Test
+    @DisplayName("성공적으로 presigned URL을 받아옴")
+    void generateDownloadPresignedUrlSuccessTest() {
+        // given
+        String userId = "testUserId";
+
+        // when
+        String presignedUrl = s3Service.generatePresignedUrl(userId, S3FileType.PROFILE);
+        System.out.println(presignedUrl);
+
+        // then
+        assertThat(presignedUrl).isNotNull();
+    }
 }

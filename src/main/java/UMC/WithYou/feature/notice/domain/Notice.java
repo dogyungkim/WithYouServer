@@ -3,8 +3,13 @@ package UMC.WithYou.feature.notice.domain;
 import UMC.WithYou.common.BaseEntity;
 import UMC.WithYou.feature.member.domain.Member;
 import UMC.WithYou.feature.travel.domain.Travel;
+import UMC.WithYou.feature.travel.domain.TravelStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -23,7 +28,11 @@ public class Notice extends BaseEntity {
 
     private String content;
 
-    private int state; //0: 여행전, 1: 여행중, 2: 여행후
+    @Enumerated(EnumType.STRING)
+    private TravelStatus status;
+
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NoticeCheck> noticeChecks = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
@@ -32,6 +41,4 @@ public class Notice extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="log_id")
     private Travel travel;
-
-
 }

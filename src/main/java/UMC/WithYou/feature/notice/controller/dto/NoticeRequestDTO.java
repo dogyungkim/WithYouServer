@@ -1,6 +1,7 @@
 package UMC.WithYou.feature.notice.controller.dto;
 
 import UMC.WithYou.common.validation.annotation.ExistNotices;
+import UMC.WithYou.feature.travel.domain.TravelStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public class NoticeRequestDTO {
         //@ExistLog
         Long logId;
 
-        int state;
+        TravelStatus status;
 
         String content;
     }
@@ -27,7 +28,7 @@ public class NoticeRequestDTO {
         @ExistNotices
         Long noticeId;
 
-        int state;
+        TravelStatus status;
 
         String content;
     }

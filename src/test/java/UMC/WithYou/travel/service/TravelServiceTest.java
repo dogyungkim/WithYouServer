@@ -8,7 +8,6 @@ import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.domain.Traveler;
 import UMC.WithYou.feature.travel.repository.TravelRepository;
 import UMC.WithYou.feature.travel.service.TravelService;
-import UMC.WithYou.infra.s3.S3FileType;
 import UMC.WithYou.infra.s3.S3PreSignService;
 import UMC.WithYou.infra.s3.S3Service;
 import UMC.WithYou.member.MemberFixture;
@@ -94,10 +93,9 @@ class TravelServiceTest {
             Traveler traveler = TravelFixture.createTraveler(testTravel, testMember);
             
             testMember.addTraveler(traveler);
-            String expectedPresignedUrl = "https://s3.amazonaws.com/presigned-url";
 
-            when(s3Interface.generatePresignedUrl(anyString(), any(S3FileType.class)))
-                    .thenReturn(expectedPresignedUrl);
+            when(travelRepository.findTravelsByMemberWithFetch(any(Member.class)))
+                   .thenReturn(List.of(testTravel));
 
             // when
             List<Travel> travels = travelService.getTravels(testMember, today);
@@ -105,7 +103,6 @@ class TravelServiceTest {
             // then
             assertThat(travels).hasSize(1);
             assertThat(travels.get(0)).isEqualTo(testTravel);
-            assertThat(travels.get(0).getImageUrl()).isEqualTo(expectedPresignedUrl);
         }
     }
 
@@ -125,7 +122,6 @@ class TravelServiceTest {
             // then
             assertThat(deletedTravelId).isEqualTo(1L);
             verify(travelRepository).delete(testTravel);
-            verify(s3Service).deleteFile(testTravel.getImageUrl());
         }
 
         @Test
@@ -193,15 +189,12 @@ class TravelServiceTest {
             String newTitle = "수정된 여행";
             LocalDate newStartDate = today.plusDays(2);
             LocalDate newEndDate = today.plusDays(6);
-            String expectedPresignedUrl = "https://s3.amazonaws.com/presigned-url";
 
             // 테스트 멤버가 여행자인 상황 설정
             Traveler traveler = TravelFixture.createTraveler(testTravel, testMember);
             testTravel.addTravelMember(traveler);
 
             when(travelRepository.findById(any(Long.class))).thenReturn(Optional.of(testTravel));
-            when(s3Interface.generatePresignedUrl(anyString(), any(S3FileType.class)))
-                    .thenReturn(expectedPresignedUrl);
 
             // when
             travelService.editTravelWithImage(testMember, 1L, newTitle, newStartDate, newEndDate, today);

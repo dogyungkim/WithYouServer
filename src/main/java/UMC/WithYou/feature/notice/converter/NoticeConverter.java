@@ -24,7 +24,7 @@ public class NoticeConverter {
 
     public static Notice toFixNotice(NoticeRequestDTO.FixDto request, Member member, Travel travel){
         return Notice.builder()
-                .state(request.getState())
+                .status(request.getStatus())
                 .member(member)
                 .travel(travel)
                 .id(request.getNoticeId())
@@ -35,7 +35,7 @@ public class NoticeConverter {
     public static Notice toNotice(NoticeRequestDTO.JoinDto request, Member member, Travel travel){
         return Notice.builder()
                 .content(request.getContent())
-                .state(request.getState())
+                .status(request.getStatus())
                 .member(member)
                 .travel(travel)
                 .build();

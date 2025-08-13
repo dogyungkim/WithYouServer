@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @AllArgsConstructor
@@ -59,6 +60,28 @@ public class TravelController {
         return WithUResponse.onSuccess(new CreateTravelResponseDTO(presignedUrl));
     }
 
+    @Operation(summary = "트래블 로그 추가 with Multipart")
+    @Parameters({
+            @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
+            @Parameter(name = "member", hidden = true),
+    })
+    @PostMapping("/with-image")
+    public WithUResponse<CreateTravelResponseDTO> createTravelWithMultipart(
+            @AuthorizedMember Member member,
+            @RequestPart MultipartFile bannerImage,
+            @RequestPart CreatePodRequestDTO request
+    ){
+        String title = request.getTitle();
+        LocalDate startDate = request.getStartDate();
+        LocalDate endDate = request.getEndDate();
+        LocalDate localDate = request.getLocalDate();
+
+        String imageUrl = travelService.createTravelWithMultipartFile(member, title, startDate, endDate, localDate, bannerImage);
+
+        return WithUResponse.onSuccess(new CreateTravelResponseDTO(imageUrl));
+    }
+
+
     @Operation(summary = "멤버가 포함된 모든 여행 팟 조회")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
@@ -70,8 +93,9 @@ public class TravelController {
             @AuthorizedMember Member member,
             @RequestParam LocalDate localDate){
         List<Travel> travels = travelService.getTravels(member, localDate);
+        List<String> presignedUrls = travels.stream().map(t -> s3PreSignService.generateDownloadUrl(t.getId().toString(), S3FileType.BANNER)).toList();
         return WithUResponse.onSuccess(
-                travels.stream().map(t -> new ThumbnailResponseDTO(t)).toList()
+                travels.stream().map(t -> new ThumbnailResponseDTO(t, presignedUrls.get(travels.indexOf(t)))).toList()
         );
     }
 

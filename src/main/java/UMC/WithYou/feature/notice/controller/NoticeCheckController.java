@@ -5,7 +5,7 @@ import UMC.WithYou.feature.notice.controller.dto.NoticeCheckResponseDTO;
 import UMC.WithYou.feature.notice.controller.dto.NoticeCheckResponseDTO.ResultDto;
 import UMC.WithYou.feature.notice.converter.NoticeCheckConverter;
 import UMC.WithYou.feature.notice.domain.NoticeCheck;
-import UMC.WithYou.feature.notice.service.NoticeCheckCommandService;
+import UMC.WithYou.feature.notice.service.NoticeCheckService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/noticeCheck")
 public class NoticeCheckController {
 
-    private final NoticeCheckCommandService noticeCheckCommandService;
+    private final NoticeCheckService noticeCheckService;
 
     @Operation(summary="notice 체크 API")
     @PatchMapping
@@ -35,7 +35,7 @@ public class NoticeCheckController {
             @Parameter(name = "memberId", description = "notice 의 아이디, query param 입니다!"),
     })
     public WithUResponse<NoticeCheckResponseDTO.ResultDto> checkBox(@RequestParam("noticeId") Long noticeId, @RequestParam("memberId") Long memberId){
-        NoticeCheck noticeCheck=noticeCheckCommandService.checkBox(noticeId,memberId);
+        NoticeCheck noticeCheck=noticeCheckService.checkBox(noticeId,memberId);
         return WithUResponse.onSuccess(NoticeCheckConverter.toResultDTO(noticeCheck));
     }
 }

@@ -5,6 +5,6 @@ spring:
   application:
     name: yongjibus
   profiles:
-    active: local
+    active: test
   config:
     import: optional:file:.env[.properties]
