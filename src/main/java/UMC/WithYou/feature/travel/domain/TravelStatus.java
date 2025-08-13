@@ -1,7 +1,7 @@
 package UMC.WithYou.feature.travel.domain;
 
 public enum TravelStatus {
-    UPCOMING,
+    BEFORE,
     ONGOING,
-    BYGONE
+    AFTER
 }

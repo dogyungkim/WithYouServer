@@ -8,7 +8,7 @@ import UMC.WithYou.feature.notice.controller.dto.NoticeRequestDTO;
 import UMC.WithYou.feature.notice.controller.dto.NoticeResponseDTO;
 import UMC.WithYou.feature.notice.converter.NoticeConverter;
 import UMC.WithYou.feature.notice.domain.Notice;
-import UMC.WithYou.feature.notice.service.NoticeCommandService;
+import UMC.WithYou.feature.notice.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("/api/v1/notice")
 public class NoticeController {
 
-    private final NoticeCommandService noticeCommandService;
+    private final NoticeService noticeService;
 
     @Operation(summary="notice 생성 API(0: 여행전, 1: 여행중, 2: 여행후)")
     @PostMapping
@@ -37,8 +37,11 @@ public class NoticeController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER4003", description = "해당 member가 없습니다",content = @Content(schema = @Schema(implementation = WithUResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "LOG4013", description = "해당 로그가 없습니다",content = @Content(schema = @Schema(implementation = WithUResponse.class))),
     })
-    public WithUResponse<NoticeResponseDTO.JoinResultDto> create(@RequestBody @Valid NoticeRequestDTO.JoinDto request){
-        Notice notice= noticeCommandService.createNotice(request);
+    public WithUResponse<NoticeResponseDTO.JoinResultDto> create(
+        @RequestBody @Valid NoticeRequestDTO.JoinDto request,
+        @AuthorizedMember Member member
+    ){
+        Notice notice = noticeService.createNotice(request, member);
         return WithUResponse.onSuccess(NoticeConverter.toJoinResultDTO(notice));
     }
 
@@ -52,23 +55,9 @@ public class NoticeController {
     @Parameters({
             @Parameter(name = "noticeId", description = "notice 의 아이디, path variable 입니다!"),
     })
-    public WithUResponse<NoticeResponseDTO.JoinResultDto> delete(@PathVariable Long noticeId){
-        Notice notice=noticeCommandService.delete(noticeId);
-        return WithUResponse.onSuccess(NoticeConverter.toJoinResultDTO(notice));
-    }
-
-    @Operation(summary="notice 단건 조회 API")
-    @GetMapping("/{noticeId}")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "NOTICE2000",description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "NOTICE4023", description = "해당 notice가 없습니다",content = @Content(schema = @Schema(implementation = WithUResponse.class))),
-    })
-    @Parameters({
-            @Parameter(name = "noticeId", description = "notice 의 아이디, path variable 입니다!"),
-    })
-    public WithUResponse<NoticeResponseDTO.ResultDto> getNotice(@PathVariable Long noticeId){
-        Notice notice=noticeCommandService.getNotice(noticeId);
-        return WithUResponse.onSuccess(NoticeConverter.toResultDTO(notice));
+    public WithUResponse<Void> delete(@PathVariable Long noticeId){
+        noticeService.delete(noticeId);
+        return WithUResponse.onSuccess_NoContent();
     }
 
     @Operation(summary="travelLog에 따른 notice 모두 조회 API")
@@ -80,8 +69,11 @@ public class NoticeController {
     @Parameters({
             @Parameter(name = "logId", description = "travel log 의 아이디, path variable 입니다!"),
     })
-    public WithUResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getTravelNotice(@PathVariable Long travelId, @AuthorizedMember Member member){
-        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeCommandService.getTravelNotice(travelId , member.getId());
+    public WithUResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getTravelNotice(
+        @PathVariable Long travelId, 
+        @AuthorizedMember Member member
+        ){
+        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeService.getTravelNotice(travelId , member.getId());
         return WithUResponse.onSuccess(notices);
     }
 
@@ -95,7 +87,7 @@ public class NoticeController {
             @Parameter(name = "logId", description = "travel log 의 아이디, path variable 입니다!"),
     })
     public WithUResponse<List<NoticeCheckResponseDTO.ShortResponseDto>> getDateNotice(@PathVariable Long travelId , @AuthorizedMember Member member){
-        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeCommandService.getDateNotice(travelId , member.getId());
+        List<NoticeCheckResponseDTO.ShortResponseDto> notices=noticeService.getDateNotice(travelId , member.getId());
         return WithUResponse.onSuccess(notices);
     }
 
@@ -106,7 +98,7 @@ public class NoticeController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "NOTICE4023", description = "해당 notice가 없습니다",content = @Content(schema = @Schema(implementation = WithUResponse.class))),
     })
     public WithUResponse<NoticeResponseDTO.JoinResultDto> fix(@RequestBody @Valid NoticeRequestDTO.FixDto request){
-        Notice notice=noticeCommandService.fix(request);
+        Notice notice=noticeService.fix(request);
         return WithUResponse.onSuccess(NoticeConverter.toJoinResultDTO(notice));
     }
 

@@ -25,13 +25,13 @@ public class TravelResponseDTO {
         private LocalDate endDate;
         private TravelStatus status;
         private String imageUrl;
-        public ThumbnailResponseDTO(Travel travel){
+        public ThumbnailResponseDTO(Travel travel, String imageUrl){
             travelId = travel.getId();
             title = travel.getTitle();
             startDate = travel.getStartDate();
             endDate = travel.getEndDate();
             status = travel.getStatus();
-            imageUrl = travel.getImageUrl();
+            this.imageUrl = imageUrl;
         }
     }
 

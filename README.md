@@ -1,18 +1,22 @@
 # WithYou
+<img width="2250" height="1104" alt="Image" src="https://github.com/user-attachments/assets/f22640ce-62be-4adb-84e4-8fb44990c930" />
+여행의 추억을 공유하고 소통하는 소셜 미디어 플랫폼 **WithYou**의 백엔드 레포지토리입니다.
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/your-username/withyou-server)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
-**WithYou**는 여행의 추억을 공유하고 소통하는 소셜 미디어 플랫폼의 백엔드 API입니다. 이 프로젝트는 Spring Boot를 기반으로 구축되었으며, 사용자 인증, 게시물 관리, 클라우드 연동 등 다양한 기능을 제공합니다.
+## 서비스 소개
+<p align="center">
+  <img width="500" alt="Land1" src="https://github.com/user-attachments/assets/03c322ca-f06c-4745-8b3b-71eb10f1e3d4" />
+  <img width="500" alt="Land2" src="https://github.com/user-attachments/assets/cc3169c9-0d50-48f2-9933-5e1d40da6ee9" />
+  <img width="500" alt="Land3" src="https://github.com/user-attachments/assets/dd509db5-9cda-4920-8483-85708000301e" />
+  <img width="500" alt="Land4" src="https://github.com/user-attachments/assets/f3f3f159-2e37-49de-b923-cc171b246c61" />
+</p>
 
 ## ✨ 주요 기능
 
 - **사용자 관리:** 회원가입, 로그인, 소셜 로그인 (OAuth 2.0)
-- **인증/인가:** JWT (JSON Web Token) 기반의 안전한 인증 시스템
+- **인증/인가:** JWT (JSON Web Token) 기반의 인증 시스템
 - **게시물 관리:** 여행기, 사진 등 게시물 CRUD
 - **소셜 기능:** 댓글, 좋아요, 팔로우
-- **클라우드 연동:** AWS S3를 이용한 미디어 파일 업로드 및 관리
-- **API 문서:** Swagger (Springdoc OpenAPI)를 통한 API 명세 자동화
+- **미디어 관리:** AWS S3를 이용한 미디어 파일 업로드 및 관리
 
 ## 🛠️ 기술 스택
 
@@ -53,11 +57,7 @@
 ## 🏛️ 아키텍처
 
 ### 서비스 아키텍처
-![Architecture](.docs/architecture.png)
-
-### CI/CD 파이프라인
-<img src=".docs/cicd_pipeline.png" width="750"/>
-
+<img width="1101" height="620" alt="서비스 아키텍처" src="https://github.com/user-attachments/assets/b1a99e9d-7fd7-4b00-9e0d-3deb4cc51be3" />
 
 ## 📁 디렉토리 구조
 ```

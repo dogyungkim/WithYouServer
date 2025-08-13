@@ -6,6 +6,7 @@ import UMC.WithYou.feature.member.domain.Member;
 import UMC.WithYou.feature.member.repository.MemberRepository;
 import UMC.WithYou.feature.notice.controller.dto.NoticeCheckResponseDTO;
 import UMC.WithYou.feature.notice.controller.dto.NoticeRequestDTO;
+import UMC.WithYou.feature.notice.controller.dto.NoticeCheckResponseDTO.ShortResponseDto;
 import UMC.WithYou.feature.notice.converter.NoticeConverter;
 import UMC.WithYou.feature.notice.domain.Notice;
 import UMC.WithYou.feature.notice.domain.NoticeCheck;
@@ -13,6 +14,7 @@ import UMC.WithYou.feature.notice.repository.NoticeCheckRepository;
 import UMC.WithYou.feature.notice.repository.NoticeRepository;
 import UMC.WithYou.feature.notice.repository.NoticeRepositoryCustom;
 import UMC.WithYou.feature.travel.domain.Travel;
+import UMC.WithYou.feature.travel.domain.TravelStatus;
 import UMC.WithYou.feature.travel.repository.TravelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class NoticeCommandServiceImpl implements NoticeCommandService{
+public class NoticeService {
 
     private final NoticeRepository noticeRepository;
     private final NoticeCheckRepository noticeCheckRepository;
@@ -37,11 +42,11 @@ public class NoticeCommandServiceImpl implements NoticeCommandService{
         return dateTime.isAfter(startDateTime) && dateTime.isBefore(endDateTime);
     }
 
-    @Override
+    //Will be deprecated
     public List<NoticeCheckResponseDTO.ShortResponseDto> getDateNotice(Long travelId, Long memberId) {
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CommonErrorHandler(ErrorStatus.TRAVEL_LOG_NOT_FOUND));
-        int states = travel.getStatus().ordinal();
+        TravelStatus states = travel.getStatus();
 
         List<NoticeCheckResponseDTO.ShortResponseDto> results = new ArrayList<>();
         List<Notice> notices = noticeRepositoryCustom.findByTravelLogFetchJoinMember(travelId);
@@ -49,7 +54,7 @@ public class NoticeCommandServiceImpl implements NoticeCommandService{
                 .orElseThrow(() -> new CommonErrorHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         for (Notice notice : notices) {
-            if (notice.getState() != states)
+            if (notice.getStatus() != states)
                 continue;
 
             List<NoticeCheck> noticeChecks = noticeCheckRepository.findAllByIsCheckedIsTrueAndNotice(notice);
@@ -66,65 +71,75 @@ public class NoticeCommandServiceImpl implements NoticeCommandService{
         return results;
     }
 
-
-    @Override
     public List<NoticeCheckResponseDTO.ShortResponseDto> getTravelNotice(Long travelId , Long memberId){
         List<NoticeCheckResponseDTO.ShortResponseDto> results = new ArrayList<>();
-        List<Notice> notices=noticeRepositoryCustom.findByTravelLogFetchJoinMember(travelId);
+        //QueryDSL 삭제
+        //List<Notice> notices = noticeRepositoryCustom.findByTravelLogFetchJoinMember(travelId);
+        List<Notice> notices = noticeRepository.findByTravelIdFetchJoinMember(travelId);
 
-        for (Notice notice : notices) {
-            List<NoticeCheck> noticeChecks = noticeCheckRepository.findAllByIsCheckedIsTrueAndNotice(notice);
-            int checkCount = noticeChecks.size();
-
-            // 여기에 사용자가 체크했는지 여부를 포함
-            boolean isChecked = false;
-            for (NoticeCheck noticeCheck : noticeChecks) {
-                if (noticeCheck.getMember().getId().equals(memberId)) {
-                    isChecked = true;
-                    break;
-                }
-            }
-
-            NoticeCheckResponseDTO.ShortResponseDto dto = NoticeConverter.toSearch(notice, checkCount, isChecked);
-            results.add(dto);
+        if (notices.isEmpty()) {
+            return results;
         }
-        return results;
-    }
 
-    @Override
-    public Notice createNotice(NoticeRequestDTO.JoinDto request){
-        Member member = memberRepository.findById(request.getMemberId())
-                .orElseThrow(()->new CommonErrorHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        // // AS-IS
+        // for (Notice notice : notices) {
+        //     List<NoticeCheck> noticeChecks = noticeCheckRepository.findAllByIsCheckedIsTrueAndNotice(notice);
+        //     int checkCount = noticeChecks.size();
+
+        //     // 여기에 사용자가 체크했는지 여부를 포함
+        //     boolean isChecked = false;
+        //     for (NoticeCheck noticeCheck : noticeChecks) {
+        //         if (noticeCheck.getMember().getId().equals(memberId)) {
+        //             isChecked = true;
+        //             break;
+        //         }
+        //     }
+
+        //     NoticeCheckResponseDTO.ShortResponseDto dto = NoticeConverter.toSearch(notice, checkCount, isChecked);
+        //     results.add(dto);
+        // }
+        // return results;
+        
+        // TO-BE
+        List<Long> noticeIds = notices.stream()
+            .map(Notice::getId)
+            .collect(Collectors.toList());
+
+        // 체크된 노티스 조회
+        List<NoticeCheck> noticeChecks = noticeCheckRepository.findAllByNoticeIds(noticeIds);
+
+        // 노티스 아이디별 체크 목록 맵핑
+        Map<Long, List<NoticeCheck>> checksByNoticeId = noticeChecks.stream()
+            .collect(Collectors.groupingBy(check -> check.getNotice().getId()));
+
+        return notices.stream()
+            .map(notice -> {
+                List<NoticeCheck> checks = checksByNoticeId.getOrDefault(notice.getId(), new ArrayList<>());
+                int checkCount = checks.size();
+                // 사용자가 체크한 노티스 조회
+                boolean isChecked = checks.stream()
+                    .anyMatch(check -> check.getMember().getId().equals(memberId));
+                return NoticeConverter.toSearch(notice, checkCount, isChecked);
+            })
+            .collect(Collectors.toList());
+    }
+    
+    public Notice createNotice(NoticeRequestDTO.JoinDto request, Member member){
         Travel travel = travelRepository.findById(request.getLogId())
                 .orElseThrow(()->new CommonErrorHandler(ErrorStatus.TRAVEL_LOG_NOT_FOUND));
 
-        Notice newNotice= NoticeConverter.toNotice(request,member,travel);
-        Notice notice=noticeRepository.save(newNotice);
-
-        return notice;
+        Notice newNotice = NoticeConverter.toNotice(request,member,travel);
+        return noticeRepository.save(newNotice);
     }
 
-    @Override
-    public Notice delete(Long noticeId){
-        Notice notice= noticeRepository.findById(noticeId).get();
+    public void delete(Long noticeId){
         noticeRepository.deleteById(noticeId);
-
-        return notice;
     }
 
-    @Override
     public Notice fix(NoticeRequestDTO.FixDto request){
         Notice notice= noticeRepository.findById(request.getNoticeId()).get();
         Notice newNotice=NoticeConverter.toFixNotice(request,notice.getMember(),notice.getTravel());
 
-        noticeRepository.save(newNotice);
-        return notice;
-    }
-
-    @Override
-    public Notice getNotice(Long noticeId){
-        Notice notice= noticeRepository.findById(noticeId).get();
-
-        return notice;
+        return noticeRepository.save(newNotice);
     }
 }

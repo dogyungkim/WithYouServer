@@ -77,7 +77,7 @@ public class TravelFixture {
         Travel travel = createDefaultTravel();
         LocalDate today = LocalDate.now();
         
-        if (status == TravelStatus.UPCOMING) {
+        if (status == TravelStatus.BEFORE) {
             travel = new Travel(
                 MemberFixture.createDefaultMember(),
                 "예정된 여행",
@@ -91,7 +91,7 @@ public class TravelFixture {
                 today.minusDays(2),
                 today.plusDays(3)
             );
-        } else if (status == TravelStatus.BYGONE) {
+        } else if (status == TravelStatus.AFTER) {
             travel = new Travel(
                 MemberFixture.createDefaultMember(),
                 "지난 여행",

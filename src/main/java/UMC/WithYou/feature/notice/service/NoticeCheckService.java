@@ -19,13 +19,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class NoticeCheckCommandServiceImpl implements NoticeCheckCommandService{
+public class NoticeCheckService {
 
     private final NoticeCheckRepository noticeCheckRepository;
     private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository;
 
-    @Override
     public NoticeCheck checkBox(Long noticeId, Long memberId){
         Notice notice= noticeRepository.findById(noticeId)
                 .orElseThrow(()->new CommonErrorHandler(ErrorStatus._NOTICE_NOT_FOUND));

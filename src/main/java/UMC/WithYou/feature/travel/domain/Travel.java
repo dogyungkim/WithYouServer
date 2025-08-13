@@ -104,13 +104,13 @@ public class Travel extends BaseEntity {
 
     public void setTravelStatus(LocalDate localDate){
         if(endDate.isBefore(localDate)){
-            this.status = TravelStatus.BYGONE;
+            this.status = TravelStatus.AFTER;
         }
         else if (!startDate.isAfter(localDate)){
             this.status = TravelStatus.ONGOING;
         }
         else{
-            this.status = TravelStatus.UPCOMING;
+            this.status = TravelStatus.BEFORE;
         }
     }
 

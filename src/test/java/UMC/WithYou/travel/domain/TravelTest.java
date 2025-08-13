@@ -72,7 +72,7 @@ class TravelTest {
             pastTravel.setTravelStatus(today);
 
             // then
-            assertThat(pastTravel.getStatus()).isEqualTo(TravelStatus.BYGONE);
+            assertThat(pastTravel.getStatus()).isEqualTo(TravelStatus.AFTER);
         }
 
         @Test
@@ -98,7 +98,7 @@ class TravelTest {
             upcomingTravel.setTravelStatus(today);
 
             // then
-            assertThat(upcomingTravel.getStatus()).isEqualTo(TravelStatus.UPCOMING);
+            assertThat(upcomingTravel.getStatus()).isEqualTo(TravelStatus.BEFORE);
         }
 
         @Test
