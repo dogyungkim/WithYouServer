@@ -4,14 +4,11 @@ import UMC.WithYou.feature.auth.domain.RefreshToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.security.auth.message.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -36,25 +33,16 @@ public class JwtTokenProvider implements TokenProvider {
     @Value("${jwt.refresh.expiration-period}")
     private Long refreshTokenValidTime;
 
-    private final UserDetailsService userDetailsService;
-
-
     @PostConstruct
     private void init() {
         key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     @Override
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.parsePayload(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
-    }
-
-    @Override
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(jwtHeader);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(jwtTokenPrefix)) {
-            return bearerToken.substring(jwtTokenPrefix.length());
+            return bearerToken.substring(jwtTokenPrefix.length() + 1);
         }
         return null;
     }
@@ -63,7 +51,7 @@ public class JwtTokenProvider implements TokenProvider {
     public String createToken(String payload) {
         log.info("payload = {}" ,payload);
         Date now = new Date();
-        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(expirationPeriod));
+        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(refreshTokenValidTime));
         return Jwts.builder()
                 .setSubject(payload)
                 .setIssuedAt(now)
