@@ -66,15 +66,15 @@ public class TokenProviderTest {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        // The current implementation catches the exception and returns true
-        assertTrue(tokenProvider.validateToken(expiredToken));
+        // 만료 토큰은 false
+        assertFalse(tokenProvider.validateToken(expiredToken));
     }
 
     @Test
     void 잘못된_토큰_검증_테스트() {
         String invalidToken = "invalid-token";
-        // The current implementation catches the exception and returns true
-        assertTrue(tokenProvider.validateToken(invalidToken));
+        // 잘못된 토큰은 false
+        assertFalse(tokenProvider.validateToken(invalidToken));
     }
 
 
@@ -86,7 +86,8 @@ public class TokenProviderTest {
         assertNotNull(refreshToken);
         assertEquals(payload, refreshToken.getKey());
         assertNotNull(refreshToken.getValue());
-        assertEquals(1440L, refreshToken.getExpiredTime());
+        // TTL 분 설정(1440분)을 초 단위로 저장하므로 1440*60
+        assertEquals(1440L * 60, refreshToken.getExpiredTime());
     }
 
     @Test

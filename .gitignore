@@ -52,4 +52,4 @@ xLoadTest/
 docker-compose.yml
 /.gemini
 
-Docker-History.md
+/src/main/java/UMC/Withyou/feature/TestAuthController.java

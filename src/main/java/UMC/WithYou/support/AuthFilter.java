@@ -29,10 +29,8 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwtToken = tokenProvider.resolveToken(request);
-        log.info("{}", jwtToken);
         // 테스트 용 슈퍼 토큰
-        if (jwtToken.equals("SUPER_DUPER_ADMIN_TOKEN")){
-            log.info("{}",jwtToken);
+        if ("SUPER_DUPER_ADMIN_TOKEN".equals(jwtToken)){
             UserDetails ud = userDetailsService.loadUserByUsername("4310760394");
             Authentication authentication = new UsernamePasswordAuthenticationToken(ud,"test-id-1",ud.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

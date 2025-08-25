@@ -4,7 +4,6 @@ import UMC.WithYou.feature.auth.domain.RefreshToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.security.auth.message.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,16 +41,16 @@ public class JwtTokenProvider implements TokenProvider {
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(jwtHeader);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(jwtTokenPrefix)) {
-            return bearerToken.substring(jwtTokenPrefix.length() + 1);
+            return bearerToken.substring(jwtTokenPrefix.length());
         }
         return null;
     }
 
     @Override
     public String createToken(String payload) {
-        log.info("payload = {}" ,payload);
         Date now = new Date();
-        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(refreshTokenValidTime));
+        // Access Token 은 jwt.expiration-period 를 사용
+        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(expirationPeriod));
         return Jwts.builder()
                 .setSubject(payload)
                 .setIssuedAt(now)
@@ -78,7 +77,8 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public RefreshToken createRefreshToken(String payload) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(expirationPeriod));
+        // Refresh Token 은 jwt.refresh.expiration-period 를 사용
+        Date validity = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(refreshTokenValidTime));
 
         String value = Jwts.builder()
                 .setSubject(UUID.randomUUID().toString())
@@ -90,7 +90,7 @@ public class JwtTokenProvider implements TokenProvider {
         return RefreshToken.builder()
                 .key(payload)
                 .value(value)
-                .expiredTime(refreshTokenValidTime)
+                .expiredTime(TimeUnit.MINUTES.toSeconds(refreshTokenValidTime))
                 .build();
     }
 
@@ -101,11 +101,11 @@ public class JwtTokenProvider implements TokenProvider {
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
+            return true;
         } catch (ExpiredJwtException e) {
-            //throw new AuthException(AuthExceptionType.EXPIRED_AUTHORIZATION);
+            return false;
         } catch (JwtException | IllegalArgumentException e) {
-            //throw new AuthException(AuthExceptionType.INVALID_AUTHORIZATION);
+            return false;
         }
-        return true;
     }
 }
