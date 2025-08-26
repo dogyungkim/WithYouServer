@@ -35,6 +35,37 @@ log_step() {
     echo -e "${PURPLE}[STEP]${NC} $1"
 }
 
+# Docker 이미지 정리 함수
+cleanup_docker_images() {
+    local current_tag="$1"
+    local repository="prunsoli/withyou-test"
+    
+    # 현재 사용 중인 이미지를 제외한 이전 버전들 찾기
+    local old_images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "$repository" | grep -v "$current_tag" || true)
+    
+    if [ ! -z "$old_images" ]; then
+        echo "🗑️  삭제할 이전 이미지들:"
+        echo "$old_images"
+        
+        # 이미지 삭제 시도
+        local deleted_count=0
+        while IFS= read -r image; do
+            if docker rmi -f "$image" 2>/dev/null; then
+                deleted_count=$((deleted_count + 1))
+                log_info "삭제됨: $image"
+            else
+                log_warning "삭제 실패 (사용 중일 수 있음): $image"
+            fi
+        done <<< "$old_images"
+        
+        if [ $deleted_count -gt 0 ]; then
+            log_success "✅ $deleted_count 개의 이전 버전 이미지 삭제 완료"
+        fi
+    else
+        log_info "📝 정리할 이전 이미지가 없습니다."
+    fi
+}
+
 # 설정 변수
 DOCKER_REGISTRY="prunsoli"
 PROJECT_NAME="withyou-test"
@@ -174,6 +205,12 @@ mv "${TEMP_FILE}" "${DOCKER_HISTORY_FILE}"
 
 log_success "✅ Docker-History.md 업데이트 완료"
 
+# Docker 빌드가 성공했으므로 백업 파일 삭제
+if [ -f "${DOCKER_HISTORY_FILE}.backup" ]; then
+    rm "${DOCKER_HISTORY_FILE}.backup"
+    log_info "백업 파일 삭제: ${DOCKER_HISTORY_FILE}.backup"
+fi
+
 # 4. SSH를 통한 서버 배포
 log_step "4단계: SSH를 통한 서버 배포 시작..."
 
@@ -181,11 +218,6 @@ if [ "${SSH_HOST}" == "your-server.com" ]; then
     log_warning "⚠️  SSH 호스트가 설정되지 않았습니다."
     log_warning "deploy.env 파일을 생성하고 SSH_HOST, SSH_USER, SSH_KEY_PATH를 설정하세요."
     log_warning ""
-    log_warning "수동 배포 명령어:"
-    log_warning "ssh your-user@your-server"
-    log_warning "cd /opt/withyou"
-    log_warning "docker pull ${DOCKER_IMAGE}"
-    log_warning "docker-compose down && docker-compose up -d"
 else
     # SSH 연결 테스트
     log_info "SSH 연결 테스트 중: ${SSH_USER}@${SSH_HOST}"
@@ -198,11 +230,6 @@ else
         log_warning "3. 사용자명: ${SSH_USER}"
         log_warning "4. 서버의 SSH 포트가 열려있는지 확인"
         echo ""
-        log_warning "수동 배포 명령어:"
-        log_warning "ssh ${SSH_USER}@${SSH_HOST}"
-        log_warning "cd ${REMOTE_COMPOSE_PATH}"
-        log_warning "docker pull ${DOCKER_IMAGE}"
-        log_warning "docker-compose down && docker-compose up -d"
         exit 1
     else
         log_success "✅ SSH 연결 성공"
@@ -245,6 +272,38 @@ else
                 
                 if docker-compose ps | grep -q "Up"; then
                     echo "✅ 서비스가 정상적으로 실행 중입니다."
+                    
+                    # 배포 성공 시 불필요한 Docker 이미지 정리
+                    echo "🧹 불필요한 Docker 이미지 정리 중..."
+                    
+                    # 서버에서 이전 버전 이미지들 정리
+                    OLD_IMAGES=\$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "prunsoli/withyou-test" | grep -v "${VERSION_TAG}" || true)
+                    
+                    if [ ! -z "\$OLD_IMAGES" ]; then
+                        echo "🗑️ 삭제할 서버의 이전 이미지들:"
+                        echo "\$OLD_IMAGES"
+                        
+                        deleted_count=0
+                        for image in \$OLD_IMAGES; do
+                            if docker rmi -f "\$image" 2>/dev/null; then
+                                deleted_count=\$((deleted_count + 1))
+                                echo "삭제됨: \$image"
+                            else
+                                echo "삭제 실패 (사용 중일 수 있음): \$image"
+                            fi
+                        done
+                        
+                        if [ \$deleted_count -gt 0 ]; then
+                            echo "✅ \$deleted_count 개의 서버 이전 버전 이미지 삭제 완료"
+                        fi
+                    else
+                        echo "📝 서버에 정리할 이전 이미지가 없습니다."
+                    fi
+                    
+                    # 사용하지 않는 이미지, 컨테이너, 네트워크, 볼륨 정리
+                    docker system prune -f >/dev/null 2>&1 || true
+                    echo "✅ Docker 시스템 정리 완료"
+                    
                 else
                     echo "⚠️  서비스 상태를 확인하세요."
                     docker-compose logs --tail=20
@@ -270,44 +329,37 @@ EOF
     fi
 fi
 
-# 5. Git 변경사항 커밋 및 푸시 (선택적)
-log_step "5단계: Git 변경사항 처리..."
+# 5. 로컬 환경 정리 작업
+log_step "5단계: 로컬 환경 정리 작업..."
 
-if git diff --quiet "${DOCKER_HISTORY_FILE}"; then
-    log_info "Docker-History.md에 변경사항이 없습니다."
-else
-    echo "📝 Git 변경사항을 커밋하시겠습니까? (y/N): "
-    read -r GIT_COMMIT_CONFIRM
+# 배포가 성공했다면 자동으로 정리, 실패했다면 선택적으로 정리
+if [ "${SSH_HOST}" != "your-server.com" ] && ssh -o ConnectTimeout=5 -o BatchMode=yes -i "${SSH_KEY_PATH}" "${SSH_USER}@${SSH_HOST}" "docker-compose ps | grep -q 'Up'" 2>/dev/null; then
+    # 서버 배포가 성공한 경우 자동 정리
+    log_info "서버 배포 성공 확인됨. 로컬 Docker 이미지 자동 정리 중..."
     
-    if [[ $GIT_COMMIT_CONFIRM =~ ^[Yy]$ ]]; then
-        git add "${DOCKER_HISTORY_FILE}"
-        git commit -m "docs: Docker 이미지 ${VERSION_TAG} 배포 히스토리 업데이트
-
-- 이미지: ${DOCKER_IMAGE}
-- 브랜치: ${CURRENT_BRANCH}
-- 설명: ${COMMIT_MESSAGE}"
+    # 현재 배포한 이미지를 제외한 이전 버전들 정리
+    cleanup_docker_images "${VERSION_TAG}"
+    
+    # 사용하지 않는 Docker 리소스 정리
+    docker system prune -f >/dev/null 2>&1 || true
+    log_success "✅ Docker 시스템 정리 완료"
+    
+else
+    # 서버 배포 실패 또는 SSH 설정이 안된 경우 선택적 정리
+    echo "🧹 로컬 Docker 이미지를 정리하시겠습니까? (y/N): "
+    read -r CLEANUP_CONFIRM
+    
+    if [[ $CLEANUP_CONFIRM =~ ^[Yy]$ ]]; then
+        log_info "사용하지 않는 Docker 이미지 정리 중..."
         
-        if git push origin "${CURRENT_BRANCH}"; then
-            log_success "✅ Git 푸시 완료"
-        else
-            log_warning "⚠️  Git 푸시 실패. 수동으로 푸시하세요: git push origin ${CURRENT_BRANCH}"
-        fi
+        # 현재 배포한 이미지를 제외한 이전 버전들 정리
+        cleanup_docker_images "${VERSION_TAG}"
+        
+        docker system prune -f >/dev/null 2>&1 || true
+        log_success "✅ Docker 시스템 정리 완료"
     else
-        log_info "Git 커밋을 건너뜁니다."
+        log_info "Docker 이미지 정리를 건너뜁니다."
     fi
-fi
-
-# 6. 정리 작업
-log_step "6단계: 정리 작업..."
-
-# 사용하지 않는 Docker 이미지 정리 (선택적)
-echo "🧹 사용하지 않는 Docker 이미지를 정리하시겠습니까? (y/N): "
-read -r CLEANUP_CONFIRM
-
-if [[ $CLEANUP_CONFIRM =~ ^[Yy]$ ]]; then
-    log_info "사용하지 않는 Docker 이미지 정리 중..."
-    docker image prune -f >/dev/null 2>&1 || true
-    log_success "✅ Docker 이미지 정리 완료"
 fi
 
 # 최종 결과 출력
@@ -333,4 +385,9 @@ echo ""
 echo "📚 다음 배포 시 참고사항:"
 echo "   ./deploy-local.sh [버전태그] [배포설명]"
 echo "   예: ./deploy-local.sh 0.0.6 \"로그인 기능 추가\""
+echo ""
+echo "🧹 Docker 이미지 관리:"
+echo "   - 성공적인 배포 시 이전 버전 이미지 자동 정리"
+echo "   - 수동 정리: docker images | grep prunsoli/withyou-test"
+echo "   - 전체 정리: docker system prune -a"
 echo ""

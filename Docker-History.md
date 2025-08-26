@@ -5,6 +5,7 @@
 | 날짜 | 시간 | 태그 | 명령어 | 플랫폼 | 설명 |
 |---|---|---|---|---|---|
 | 2025-08-15 | 19:23:00 | `prunsoli/withyou-test:0.0.4` | `docker buildx build --platform linux/amd64 -t prunsoli/withyou-test:0.0.4 --push .` | linux/amd64 | fix: JWT 슈퍼토큰 비교 로직 및 Swagger 경로 수정 |
+| 2025-08-26 | 15:45:38 | `prunsoli/withyou-test:0.0.5` | `docker buildx build --platform linux/amd64 -t prunsoli/withyou-test:0.0.5 --push .` | linux/amd64 | chore: 환경 설정 및 테스트 코드 수정 및 스테이징 배포 스크립트 작성 |
 | 2025-08-14 | 23:02:21 | `prunsoli/withyou-test:0.0.3` | `docker buildx build --platform linux/amd64 -t prunsoli/withyou-test:0.0.3 --push .` | linux/amd64 | feat: 테스트용 JWT 등록 및 JWT TokenProvider 수정 |
 | 2025-07-10 | 15:36:09 | `prunsoli/withyou-test:notice-as` | `docker buildx build --platform linux/amd64 -t prunsoli/withyou-test:notice-as --push .` | linux/amd64 | notice 성능 개선 이전 버전 |
 | 2025-07-09 | 17:05:01 | `prunsoli/withyou-test:notice-to` | `docker buildx build --platform linux/amd64 -t prunsoli/withyou-test:notice-to --push .` | linux/amd64 | notice 성능 개선 버전 |
