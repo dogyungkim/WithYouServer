@@ -53,3 +53,5 @@ docker-compose.yml
 /.gemini
 
 /src/main/java/UMC/Withyou/feature/TestAuthController.java
+
+deploy.env

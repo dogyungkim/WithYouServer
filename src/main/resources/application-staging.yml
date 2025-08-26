@@ -1,0 +1,67 @@
+spring:
+    config:
+        activate:
+            on-profile: staging
+      
+    datasource:
+      url: ${SPRING_DATASOURCE_URL}
+      username: ${SPRING_DATASOURCE_USERNAME}
+      password: ${SPRING_DATASOURCE_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        minimum-idle: 22
+        maximum-pool-size: 22
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL8Dialect
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                format_sql: true
+                show_sql: true
+        defer-datasource-initialization: true
+    servlet:
+      multipart:
+        max-file-size: 10MB       # 개별 파일 최대 크기
+        max-request-size: 15MB 
+    data:
+      redis:
+        host: ${REDIS_HOST}
+        port: 6379
+        
+# JWT 설정
+jwt:
+  secret: ${JWT_SECRET}
+  header: ${JWT_HEADER}
+  prefix: ${JWT_PREFIX}
+  expiration-period: ${JWT_EXPIRATION_PERIOD}
+  refresh:
+    expiration-period: ${JWT_REFRESH_EXPIRATION_PERIOD}
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+
+# S3 Mock 설정
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    stack.auto: false
+    region.static: ${AWS_REGION}
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+
+# OAuth 설정
+kakao:
+  client-id: ${KAKAO_CLIENT_ID}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+  client-secret: ${GOOGLE_CLIENT_SECRET}
+  redirect-uri: ${GOOGLE_REDIRECT_URI}
+
+apple:
+  client-id: ${APPLE_CLIENT_ID}

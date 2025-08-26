@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import UMC.WithYou.feature.member.domain.Member;
@@ -26,6 +27,7 @@ import UMC.WithYou.feature.travel.repository.TravelRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class NoticeIntegrationTest {
 
@@ -129,11 +131,6 @@ public class NoticeIntegrationTest {
     void getTravelNotice_Success() {
         // when
         List<NoticeCheckResponseDTO.ShortResponseDto> result = noticeService.getTravelNotice(travel.getId(), member1.getId());
-        for (NoticeCheckResponseDTO.ShortResponseDto dto : result) {
-            System.out.println(dto.getContent());
-            System.out.println(dto.getCheckNum());
-            System.out.println(dto.isChecked());
-        }
         
         // then
         assertThat(result).hasSize(2);

@@ -6,18 +6,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class S3Test {
 
     @Autowired
     private S3PreSignService s3Service;
 
     @Test
-    @DisplayName("성공적으로 presigned URL을 받아옴")
+    @DisplayName("성공적으로 업로드 presigned URL을 받아옴")
     void generatePresignedUrlSuccessTest() {
             // given
             String userId = "testUserId";
@@ -41,7 +43,7 @@ public class S3Test {
     }
     
     @Test
-    @DisplayName("성공적으로 presigned URL을 받아옴")
+    @DisplayName("성공적으로 다운로드 presigned URL을 받아옴")
     void generateDownloadPresignedUrlSuccessTest() {
         // given
         String userId = "testUserId";
