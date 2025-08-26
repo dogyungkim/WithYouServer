@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @AllArgsConstructor
@@ -41,7 +40,6 @@ public class TravelController {
     @Operation(summary = "트래블 팟 추가")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
     })
     @PostMapping
     public WithUResponse<CreateTravelResponseDTO> createTravel(
@@ -60,32 +58,9 @@ public class TravelController {
         return WithUResponse.onSuccess(new CreateTravelResponseDTO(presignedUrl));
     }
 
-    @Operation(summary = "트래블 로그 추가 with Multipart")
-    @Parameters({
-            @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
-    })
-    @PostMapping("/with-image")
-    public WithUResponse<CreateTravelResponseDTO> createTravelWithMultipart(
-            @AuthorizedMember Member member,
-            @RequestPart MultipartFile bannerImage,
-            @RequestPart CreatePodRequestDTO request
-    ){
-        String title = request.getTitle();
-        LocalDate startDate = request.getStartDate();
-        LocalDate endDate = request.getEndDate();
-        LocalDate localDate = request.getLocalDate();
-
-        String imageUrl = travelService.createTravelWithMultipartFile(member, title, startDate, endDate, localDate, bannerImage);
-
-        return WithUResponse.onSuccess(new CreateTravelResponseDTO(imageUrl));
-    }
-
-
     @Operation(summary = "멤버가 포함된 모든 여행 팟 조회")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
             @Parameter(name = "Local Time", description = "사용자의 현 위치의 Local Time", required = true),
     })
     @GetMapping
@@ -103,7 +78,6 @@ public class TravelController {
     @Operation(summary = "여행 팟 삭제")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
             @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long"))
     })
     @DeleteMapping("/{travelId}")
@@ -119,7 +93,6 @@ public class TravelController {
     @Operation(summary = "여행 팟 수정")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
             @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PatchMapping("/{travelId}")
@@ -138,29 +111,10 @@ public class TravelController {
         return WithUResponse.onSuccess_NoContent();
     }
 
-    
-    @Operation(summary = "여행 팟 수정 with 이미지")
-    @Parameters({
-            @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
-            @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long"))
-    })  
-    @PatchMapping("/{travelId}/image")
-    public WithUResponse<EditTravelResponseDTO> editTravelImage(
-            @AuthorizedMember Member member,
-            @PathVariable("travelId") Long travelId,
-            @RequestBody @Valid EditTravelRequestDTO request
-    ){
-        travelService.editTravelWithImage(member, travelId, request.getTitle(), request.getStartDate(), request.getEndDate(), request.getLocalDate());
-        String url = s3PreSignService.generatePresignedUrl(travelId.toString(), S3FileType.BANNER);
-        return WithUResponse.onSuccess(new EditTravelResponseDTO(url));
-    }
-
 
     @Operation(summary = "여행 팟에 포함된 모든 멤버 조회")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
             @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long"))
     })
     @GetMapping("/{travelId}/members")
@@ -176,8 +130,6 @@ public class TravelController {
 
     @Operation(summary = "여행 팟의 초대 코드 조회")
     @Parameters({
-            @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
             @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long"))
     })
     @GetMapping("/{travelId}/invitation_code")
@@ -191,7 +143,6 @@ public class TravelController {
     @Operation(summary = "여행 팟 합류")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
     })
     @PatchMapping("/members")
     public WithUResponse<JoinResponseDTO> join(
@@ -206,7 +157,6 @@ public class TravelController {
     @PatchMapping("{travelId}/members/{memberId}")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT token", required = true, schema = @Schema(type = "String"), in = ParameterIn.HEADER),
-            @Parameter(name = "member", hidden = true),
             @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long")),
             @Parameter( name = "memberId" , description = "여행 로그에서 탈퇴할 회원 Id", required = true, schema = @Schema(type = "Long"))
     })

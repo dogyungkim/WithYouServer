@@ -9,14 +9,14 @@ import UMC.WithYou.feature.travel.domain.Traveler;
 import UMC.WithYou.feature.travel.repository.TravelRepository;
 import UMC.WithYou.infra.s3.S3FileType;
 import UMC.WithYou.infra.s3.S3PreSignService;
-import UMC.WithYou.infra.s3.S3Service;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class TravelService {
     private final TravelRepository travelRepository;
     private final MemberRepository memberRepository;
-    private final S3Service s3Service;
     private final S3PreSignService s3PreSignService;
 
     public Long createTravel(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate) {
@@ -39,32 +38,12 @@ public class TravelService {
         return travelRepository.save(travel).getId();
     }
 
-    public String createTravelWithMultipartFile(Member member, String title, LocalDate startDate, LocalDate endDate, LocalDate localDate, MultipartFile image) {
-        Travel travel = new Travel(member, title, startDate, endDate);
-
-        travel.setTravelStatus(localDate);
-
-        Traveler traveler = new Traveler(travel, member);
-
-        String imageUrl = s3Service.uploadImg(image);
-        travel.setImageUrl(imageUrl);
-
-        travel.addTravelMember(traveler);
-
-        travelRepository.save(travel);
-        return imageUrl;
-    }
-
     public List<Travel> getTravels(Member member, LocalDate currentLocalDate) {
         List<Travel> travels = travelRepository.findTravelsByMemberWithFetch(member);
 
         for (Travel travel : travels) {
             travel.setTravelStatus(currentLocalDate);
         }
-        // TODO : 이미지 추가 시 주석 해제
-        // travels.forEach(t -> 
-        //     t.setImageUrl(s3PreSignService.generatePresignedUrl(t.getId().toString(), S3FileType.BANNER))
-        // );
 
         return travels;
     }
@@ -89,15 +68,6 @@ public class TravelService {
         Travel travel = findTravelById(travelId);
 
         validateTraveler(member, travel);
-        travel.edit(title, startDate, endDate);
-        travel.setTravelStatus(localDate);
-    }
-
-    public void editTravelWithImage(Member member, Long travelId, String title,
-    LocalDate startDate, LocalDate endDate, LocalDate localDate) {
-        Travel travel = findTravelById(travelId);
-        validateTraveler(member, travel);
-
         travel.edit(title, startDate, endDate);
         travel.setTravelStatus(localDate);
     }
@@ -144,7 +114,6 @@ public class TravelService {
         return invitationCode;
 
     }
-
 
     public void leave(Member member, Long travelId, Long memberId) {
         Travel travel = findTravelById(travelId);
