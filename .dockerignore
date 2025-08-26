@@ -1,0 +1,60 @@
+# Git 관련 파일들
+.git
+.gitignore
+.gitattributes
+
+# IDE 관련 파일들
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS 관련 파일들
+.DS_Store
+Thumbs.db
+
+# Gradle 관련 파일들
+.gradle/
+build/
+!gradle-wrapper.jar
+
+# 테스트 관련 파일들
+build/reports/
+build/test-results/
+
+# 로그 파일들
+*.log
+logs/
+
+# 임시 파일들
+*.tmp
+*.temp
+
+# Node.js 관련 (필요한 경우)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 환경 설정 파일들
+.env
+.env.local
+.env.*.local
+deploy.env
+
+# 백업 파일들
+*.backup
+*.bak
+
+# 문서 파일들 (선택적)
+README*.md
+docs/
+Docker-History.md
+deploy-local.sh
+docker-compose.yml
+
+# 테스트 데이터
+xLoadTest/
+
+# Generated 파일들
+src/main/generated/

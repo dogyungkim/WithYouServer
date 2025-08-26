@@ -7,4 +7,5 @@ import UMC.WithYou.feature.auth.domain.RefreshToken;
 
 @Repository
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken,String> {
+    java.util.Optional<RefreshToken> findByValue(String value);
 }

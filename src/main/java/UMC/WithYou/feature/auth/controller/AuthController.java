@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +25,16 @@ public class AuthController {
     @PostMapping
     public WithUResponse<LoginResponse> login(@RequestBody LoginRequest request) throws Exception {
         return WithUResponse.onSuccess(authService.authenticateOrRegisterUser(request));
+    }
+
+    @Operation(summary = "Access Token 재발급 API")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "재발급 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "재발급 실패", content = @io.swagger.v3.oas.annotations.media.Content(schema = @Schema(implementation = String.class)))
+    })
+    @PostMapping("/refresh")
+    public WithUResponse<LoginResponse> refresh(@RequestBody RefreshRequest request) {
+        return WithUResponse.onSuccess(authService.refreshAccessToken(request.getRefreshToken()));
     }
     
 }

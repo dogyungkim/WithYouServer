@@ -41,6 +41,7 @@ public class AuthService {
                 .orElseGet(() -> registerNewMember(userInfo));
     }
 
+    @Transactional
     private LoginResponse createLoginResponse(Member member) {
         String accessToken = tokenProvider.createToken(member.getIdentifier());
         RefreshToken refreshToken = tokenProvider.createRefreshToken(member.getIdentifier());
@@ -51,12 +52,14 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional 
     private Member updateExistingMember(Member existingMember, UserInfo userInfo) {
         // 기타 필요한 정보 업데이트 로직 추가
 
         return memberRepository.save(existingMember);
     }
 
+    @Transactional
     private Member registerNewMember(UserInfo userInfo) {
         // 새 멤버 등록
         return memberRepository.save(Member.builder()
@@ -72,5 +75,29 @@ public class AuthService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find member with id: " + memberId));
         return createLoginResponse(member);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isValidAccessToken(String accessToken) {
+        return tokenProvider.validateToken(accessToken);
+    }
+
+    @Transactional
+    public LoginResponse refreshAccessToken(String refreshTokenValue) {
+        RefreshToken refreshToken = refreshTokenRepository.findByValue(refreshTokenValue)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+
+        String identifier = refreshToken.getKey();
+
+        String newAccessToken = tokenProvider.createToken(identifier);
+        RefreshToken newRefreshToken = tokenProvider.createRefreshToken(identifier);
+
+        refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.save(newRefreshToken);
+
+        return LoginResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken.getValue())
+                .build();
     }
 }

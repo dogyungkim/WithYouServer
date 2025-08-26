@@ -29,11 +29,10 @@ import java.util.List;
 public class AuthConfig {
 
     private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
-    private final JwtTokenProvider tokenProvider;
+    private final AuthFilter authFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        AuthFilter authFilter = new AuthFilter(tokenProvider);
         return http
                 .cors(c->corsConfigurationSource())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -41,7 +40,7 @@ public class AuthConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e.accessDeniedHandler(tokenAccessDeniedHandler))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/auth/**","/swagger-ui.html", "/v2/api-docs", "/swagger-resources/**", "/webjars/**")
+                        .requestMatchers("/api/v1/test-auth","/api/v1/auth/**","/swagger-ui.html", "/v2/api-docs", "/swagger-resources/**", "/webjars/**")
                         .permitAll()
                         .anyRequest().permitAll())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)

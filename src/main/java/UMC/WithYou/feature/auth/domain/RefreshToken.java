@@ -16,6 +16,7 @@ public class RefreshToken{
     @Id
     @Indexed
     private String key;
+    @Indexed
     private String value;
     @TimeToLive
     private Long expiredTime;
