@@ -80,6 +80,14 @@ public class TravelService {
         return travel.getTravelMembers();
     }
 
+    public String getBannerUploadUrl(Long travelId) {
+        return s3PreSignService.generatePresignedUrl(travelId.toString(), S3FileType.BANNER);
+    }
+
+    public String getBannerDownloadUrl(Long travelId) {
+        return s3PreSignService.generateDownloadUrl(travelId.toString(), S3FileType.BANNER);
+    }
+
     public Traveler join(Member member, String invitationCode) {
         Travel travel = travelRepository.findByInvitationCode(invitationCode).orElseThrow(
                 () -> new CommonErrorHandler(ErrorStatus.INVITATION_CODE_NOT_FOUND)

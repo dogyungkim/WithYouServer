@@ -8,17 +8,18 @@ import UMC.WithYou.feature.travel.controller.TravelResponseDTO.*;
 import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.domain.Traveler;
 import UMC.WithYou.feature.travel.service.TravelService;
-import UMC.WithYou.infra.s3.S3FileType;
-import UMC.WithYou.infra.s3.S3PreSignService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/travels")
 public class TravelController {
     private TravelService travelService;
-    private S3PreSignService s3PreSignService;
 
     @Operation(summary = "트래블 팟 추가")
     @Parameters({
@@ -53,7 +53,7 @@ public class TravelController {
         LocalDate localDate = request.getLocalDate();
 
         Long travelId = travelService.createTravel(member, title, startDate, endDate, localDate);
-        String presignedUrl = s3PreSignService.generatePresignedUrl(travelId.toString(), S3FileType.BANNER);
+        String presignedUrl = travelService.getBannerUploadUrl(travelId);
 
         return WithUResponse.onSuccess(new CreateTravelResponseDTO(presignedUrl));
     }
@@ -68,7 +68,7 @@ public class TravelController {
             @AuthorizedMember Member member,
             @RequestParam LocalDate localDate){
         List<Travel> travels = travelService.getTravels(member, localDate);
-        List<String> presignedUrls = travels.stream().map(t -> s3PreSignService.generateDownloadUrl(t.getId().toString(), S3FileType.BANNER)).toList();
+        List<String> presignedUrls = travels.stream().map(t -> travelService.getBannerDownloadUrl(t.getId())).toList();
         return WithUResponse.onSuccess(
                 travels.stream().map(t -> new ThumbnailResponseDTO(t, presignedUrls.get(travels.indexOf(t)))).toList()
         );

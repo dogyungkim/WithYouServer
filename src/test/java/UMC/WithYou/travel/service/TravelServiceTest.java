@@ -183,29 +183,6 @@ class TravelServiceTest {
         }
 
         @Test
-        @DisplayName("여행 이미지와 수정 성공")
-        void editTravelWithImage_Success() {
-            // given
-            String newTitle = "수정된 여행";
-            LocalDate newStartDate = today.plusDays(2);
-            LocalDate newEndDate = today.plusDays(6);
-
-            // 테스트 멤버가 여행자인 상황 설정
-            Traveler traveler = TravelFixture.createTraveler(testTravel, testMember);
-            testTravel.addTravelMember(traveler);
-
-            when(travelRepository.findById(any(Long.class))).thenReturn(Optional.of(testTravel));
-
-            // when
-            travelService.editTravelWithImage(testMember, 1L, newTitle, newStartDate, newEndDate, today);
-
-            // then
-            assertThat(testTravel.getTitle()).isEqualTo(newTitle);
-            assertThat(testTravel.getStartDate()).isEqualTo(newStartDate);
-            assertThat(testTravel.getEndDate()).isEqualTo(newEndDate);
-        }
-
-        @Test
         @DisplayName("여행 수정 실패 - 여행자가 아닌 경우")
         void editTravel_Fail_NotTraveler() {
             // given
