@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -96,9 +95,9 @@ public class TravelController {
             @Parameter( name = "travelId" , description = "여행 팟 Id", required = true, schema = @Schema(type = "Long"))
     })
     @PatchMapping("/{travelId}")
-    public WithUResponse<Void> editTravel(
+    public WithUResponse<EditTravelResponseDTO> editTravel(
             @AuthorizedMember Member member,
-            @RequestPart @Valid EditTravelRequestDTO request,
+            @RequestBody @Valid EditTravelRequestDTO request,
             @PathVariable("travelId") Long travelId
     ){
         String title = request.getTitle();
@@ -108,7 +107,7 @@ public class TravelController {
         
         travelService.editTravel(member, travelId, title, startDate, endDate, localDate);
 
-        return WithUResponse.onSuccess_NoContent();
+        return WithUResponse.onSuccess(new EditTravelResponseDTO(travelService.getBannerUploadUrl(travelId)));
     }
 
 

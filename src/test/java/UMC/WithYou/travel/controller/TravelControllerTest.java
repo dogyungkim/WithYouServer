@@ -136,11 +136,13 @@ class TravelControllerTest {
             newTitle, newStartDate, newEndDate, testDate);
         
         String expectedUrl = "https://s3.amazonaws.com/travel-banner/123-updated.jpg";
+        
         when(travelService.getBannerUploadUrl(travelId)).thenReturn(expectedUrl);
         
-        mockMvc.perform(patch("/api/v1/travels/{travelId}/image", travelId)
+        mockMvc.perform(patch("/api/v1/travels/{travelId}", travelId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestDTOJson))
+            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(SuccessStatus._OK.getCode()))
             .andExpect(jsonPath("$.message").value(SuccessStatus._OK.getMessage()))

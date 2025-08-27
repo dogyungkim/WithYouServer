@@ -56,7 +56,7 @@ public class TravelService {
         }
         
         if (travel.getImageUrl() != null) {
-            s3PreSignService.deleteFile(travel.getId().toString(), S3FileType.BANNER);
+            s3PreSignService.deleteFile(travel.getId().toString(), S3FileType.POD_BANNER);
         }
 
         travelRepository.delete(travel);
@@ -81,11 +81,11 @@ public class TravelService {
     }
 
     public String getBannerUploadUrl(Long travelId) {
-        return s3PreSignService.generatePresignedUrl(travelId.toString(), S3FileType.BANNER);
+        return s3PreSignService.generatePresignedUrl(travelId.toString(), S3FileType.POD_BANNER);
     }
 
     public String getBannerDownloadUrl(Long travelId) {
-        return s3PreSignService.generateDownloadUrl(travelId.toString(), S3FileType.BANNER);
+        return s3PreSignService.generateDownloadUrl(travelId.toString(), S3FileType.POD_BANNER);
     }
 
     public Traveler join(Member member, String invitationCode) {
