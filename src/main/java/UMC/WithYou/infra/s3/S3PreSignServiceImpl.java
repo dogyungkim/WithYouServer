@@ -19,7 +19,7 @@ import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
-public class S3ServicePresSigned implements S3PreSignService {
+public class S3PreSignServiceImpl implements S3PreSignService {
 
   @Value("${cloud.aws.s3.bucket}")
   private String bucket;
@@ -76,7 +76,8 @@ public class S3ServicePresSigned implements S3PreSignService {
     // 파일 타입에 따른 경로 설정
     String path = switch (fileType) {
       case PROFILE -> "users/" + idString + "/profile.png";
-      case BANNER -> "travels/" + idString + "/banner.png";
+      case LOG_BANNER -> "travels/" + idString + "/log_banner.png";
+      case POD_BANNER -> "travels/" + idString + "/pod_banner.png";
       case POST -> "travels/" + idString + "/posts.png";
       case MEDIA -> "travels/" + idString + "/media.png";
     };

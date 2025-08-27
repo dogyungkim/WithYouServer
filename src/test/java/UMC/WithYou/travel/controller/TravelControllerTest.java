@@ -8,8 +8,6 @@ import UMC.WithYou.feature.travel.controller.TravelController;
 import UMC.WithYou.feature.travel.domain.Travel;
 import UMC.WithYou.feature.travel.domain.Traveler;
 import UMC.WithYou.feature.travel.service.TravelService;
-import UMC.WithYou.infra.s3.S3PreSignService;
-import UMC.WithYou.infra.s3.S3FileType;
 import UMC.WithYou.member.MemberFixture;
 import UMC.WithYou.travel.TravelFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,10 +41,6 @@ class TravelControllerTest {
 
     @MockBean
     private TravelService travelService;
-
-    @MockBean
-    private S3PreSignService s3PreSignService;
-
     private final LocalDate testDate = LocalDate.now();
 
     @Test
@@ -68,8 +61,7 @@ class TravelControllerTest {
         when(travelService.createTravel(any(Member.class), eq(testTitle), eq(startDate), eq(endDate), eq(testDate)))
                 .thenReturn(1L);
 
-        when(s3PreSignService.generatePresignedUrl(any(String.class), eq(S3FileType.BANNER)))
-                .thenReturn(expectedUrl);
+        when(travelService.getBannerUploadUrl(1L)).thenReturn(expectedUrl);
         
         // when & then
         mockMvc.perform(post("/api/v1/travels")
@@ -144,13 +136,13 @@ class TravelControllerTest {
             newTitle, newStartDate, newEndDate, testDate);
         
         String expectedUrl = "https://s3.amazonaws.com/travel-banner/123-updated.jpg";
-      //  when(travelService.editTravelWithImage(any(Member.class), eq(travelId), eq(newTitle), eq(newStartDate), eq(newEndDate), eq(testDate)));
-        when(s3PreSignService.generatePresignedUrl(any(String.class), eq(S3FileType.BANNER)))
-                .thenReturn(expectedUrl);
         
-        mockMvc.perform(patch("/api/v1/travels/{travelId}/image", travelId)
+        when(travelService.getBannerUploadUrl(travelId)).thenReturn(expectedUrl);
+        
+        mockMvc.perform(patch("/api/v1/travels/{travelId}", travelId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestDTOJson))
+            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(SuccessStatus._OK.getCode()))
             .andExpect(jsonPath("$.message").value(SuccessStatus._OK.getMessage()))
